@@ -9,7 +9,6 @@
  * are included in all such copies.
  */
 
-
 /*
  * This file helps Angband work with Macintosh computers running OS X,
  * or OS 8/9 with CarbonLib system extention.
@@ -451,28 +450,26 @@
  *   appropriate one(s) in your A-mac-h.pch.
  */
 
-
 /*
  * Force Carbon-compatible APIs
  */
 #ifndef MACH_O_CARBON
 
 /* Can be CodeWarrior or MPW */
-# define TARGET_API_MAC_CARBON 1
+#define TARGET_API_MAC_CARBON 1
 
 #else
 
 /*
-* Must be Mach-O Carbon target with OS X gcc.
-* No need to set TARGET_API_MAC_CARBON to 1 here, but I assume it should
-* be able to make efficient use of BSD functions, hence:
-*/
-# define USE_MALLOC
+ * Must be Mach-O Carbon target with OS X gcc.
+ * No need to set TARGET_API_MAC_CARBON to 1 here, but I assume it should
+ * be able to make efficient use of BSD functions, hence:
+ */
+#define USE_MALLOC
 /* Not yet */
 /* # define USE_NIB */
 
 #endif /* !MACH_O_CARBON */
-
 
 #include "angband.h"
 
@@ -497,7 +494,8 @@ bool private_check_user_directory(cptr dirpath)
 	if (ret == 0)
 	{
 		/* Now we see if it's a directory */
-		if ((stat_buf.st_mode & S_IFMT) == S_IFDIR) return (TRUE);
+		if ((stat_buf.st_mode & S_IFMT) == S_IFDIR)
+			return (TRUE);
 
 		/*
 		 * Something prevents us from create a directory with
@@ -513,7 +511,8 @@ bool private_check_user_directory(cptr dirpath)
 		ret = mkdir(dirpath, 0700);
 
 		/* An error occured */
-		if (ret == -1) return (FALSE);
+		if (ret == -1)
+			return (FALSE);
 
 		/* Success */
 		return (TRUE);
@@ -553,19 +552,18 @@ static bool check_create_user_dir(void)
 #endif
 
 	return /* don't forget, the dirpath muts come first */
-	       private_check_user_directory(dirpath) &&
-	       private_check_user_directory(versionpath) &&
+		private_check_user_directory(dirpath) &&
+		private_check_user_directory(versionpath) &&
 #ifdef PRIVATE_USER_PATH_DATA
-	       private_check_user_directory(datapath) &&
+		private_check_user_directory(datapath) &&
 #endif
 #ifdef PRIVATE_USER_PATH_APEX
-	       private_check_user_directory(apexpath) &&
+		private_check_user_directory(apexpath) &&
 #endif
-	       private_check_user_directory(savepath);
+		private_check_user_directory(savepath);
 }
 
 #endif /* PRIVATE_USER_PATH */
-
 
 /*
  * Variant-dependent features:
@@ -586,32 +584,30 @@ static bool check_create_user_dir(void)
 
 /* Some porting examples */
 #ifdef ANGBAND30X
-# define USE_DOUBLE_TILES
-# define ALLOW_BIG_SCREEN
-# define HAS_SCORE_MENU
-# define NEW_ZVIRT_HOOKS
+#define USE_DOUBLE_TILES
+#define ALLOW_BIG_SCREEN
+#define HAS_SCORE_MENU
+#define NEW_ZVIRT_HOOKS
 /* I can't ditch this, yet, because there are many variants */
-# define USE_TRANSPARENCY
+#define USE_TRANSPARENCY
 #endif /* ANGBAND30X */
 
-# define USE_DOUBLE_TILES
-# define SAVEFILE_SCREEN
-# define ANG281_RESET_VISUALS
-# define ALLOW_BIG_SCREEN
-# define HAS_SCORE_MENU
-# define ANGBAND_CREATOR 'PrnA'
+#define USE_DOUBLE_TILES
+#define SAVEFILE_SCREEN
+#define ANG281_RESET_VISUALS
+#define ALLOW_BIG_SCREEN
+#define HAS_SCORE_MENU
+#define ANGBAND_CREATOR 'PrnA'
 
 /* Default creator signature */
 #ifndef ANGBAND_CREATOR
-# define ANGBAND_CREATOR 'A271'
+#define ANGBAND_CREATOR 'A271'
 #endif
-
 
 /*
  * Use rewritten asynchronous sound player
  */
 #define USE_ASYNC_SOUND
-
 
 /*
  * A rather crude fix to reduce amount of redraw artefacts.
@@ -631,7 +627,6 @@ static bool check_create_user_dir(void)
 #define PREF_VER_MINOR VERSION_MINOR
 #define PREF_VER_PATCH VERSION_PATCH
 #define PREF_VER_EXTRA VERSION_EXTRA
-
 
 /*
  * In OS X + gcc, use <Carbon/Carbon.h>, <CoreServices/CoreServices.h> and
@@ -673,26 +668,25 @@ static bool check_create_user_dir(void)
 
 #endif /* MACH_O_CARBON */
 
+#define _BSD_SOURCE
 /* MacOSX == Unix == Good */
 #ifdef USE_MACOSX
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <sys/time.h>
 #endif
-
 
 /*
  * Use "malloc()" instead of "NewPtr()"
  */
 /* #define USE_MALLOC */
 
-
 /*
  * Information about each of the 256 available colors
  */
 static RGBColor color_info[256];
-
 
 #ifdef MACH_O_CARBON
 
@@ -704,7 +698,6 @@ OSType _fcreator;
 OSType _ftype;
 
 #endif /* MACH_O_CARBON */
-
 
 /*
  * Forward declare
@@ -722,16 +715,15 @@ struct term_data
 
 	WindowPtr w;
 
-
 	short padding;
 
 	short pixelDepth;
 
-	GWorldPtr theGWorld; 	/* not used ... */
+	GWorldPtr theGWorld; /* not used ... */
 
 	GDHandle theGDH;
 
-	GDHandle mainSWGDH; 	/* not used ... */
+	GDHandle mainSWGDH; /* not used ... */
 
 	Str15 title;
 
@@ -770,14 +762,10 @@ struct term_data
 	s16b size_oh2;
 };
 
-
-
-
 /*
  * Forward declare -- see below
  */
 static bool CheckEvents(bool wait);
-
 
 #ifndef MACH_O_CARBON
 
@@ -789,7 +777,6 @@ static long app_dir;
 
 #endif /* !MACH_O_CARBON */
 
-
 /*
  * Delay handling of double-clicked savefiles
  */
@@ -799,7 +786,6 @@ Boolean open_when_ready = FALSE;
  * Delay handling of pre-emptive "quit" event
  */
 Boolean quit_when_ready = FALSE;
-
 
 /*
  * Aqua automatically supplies the Quit menu.
@@ -811,37 +797,30 @@ static Boolean is_aqua = FALSE;
  */
 static long mac_os_version;
 
-
 /*
  * Hack -- game in progress
  */
 static int game_in_progress = 0;
-
 
 /*
  * Only do "SetPort()" when needed
  */
 static WindowPtr active = NULL;
 
-
 /*
  * Maximum number of terms
  */
 #define MAX_TERM_DATA 8
-
 
 /*
  * An array of term_data's
  */
 static term_data data[MAX_TERM_DATA];
 
-
 /*
  * Note when "open"/"new" become valid
  */
 static bool initialized = FALSE;
-
-
 
 /*
  * Convert a C string to a pascal string in place
@@ -856,17 +835,17 @@ static void ctopstr(StringPtr src)
 	byte len;
 
 	/* Hack -- pointer */
-	char *s = (char*)(src);
+	char *s = (char *)(src);
 
 	len = strlen(s);
 
 	/* Hack -- convert the string */
-	for (i = len; i > 1; i--) s[i] = s[i - 1];
+	for (i = len; i > 1; i--)
+		s[i] = s[i - 1];
 
 	/* Hack -- terminate the string */
 	s[0] = len;
 }
-
 
 #ifdef MACH_O_CARBON
 
@@ -884,7 +863,8 @@ static OSErr path_to_spec(const char *path, FSSpec *spec)
 
 	/* Convert pathname to FSRef ... */
 	err = FSPathMakeRef(path, &ref, NULL);
-	if (err != noErr) return (err);
+	if (err != noErr)
+		return (err);
 
 	/* ... then FSRef to FSSpec */
 	err = FSGetCatalogInfo(&ref, kFSCatInfoNone, NULL, NULL, spec, NULL);
@@ -892,7 +872,6 @@ static OSErr path_to_spec(const char *path, FSSpec *spec)
 	/* Inform caller of success or failure */
 	return (err);
 }
-
 
 /*
  * (Carbon)
@@ -906,7 +885,8 @@ static OSErr spec_to_path(const FSSpec *spec, char *buf, size_t size)
 
 	/* Convert FSSpec to FSRef ... */
 	err = FSpMakeFSRef(spec, &ref);
-	if (err != noErr) return (err);
+	if (err != noErr)
+		return (err);
 
 	/* ... then FSRef to pathname */
 	err = FSRefMakePath(&ref, buf, size);
@@ -914,7 +894,6 @@ static OSErr spec_to_path(const FSSpec *spec, char *buf, size_t size)
 	/* Inform caller of success or failure */
 	return (err);
 }
-
 
 /*
  * (Carbon) [via path_to_spec]
@@ -928,10 +907,12 @@ int fsetfileinfo(char *pathname, OSType fcreator, OSType ftype)
 	FInfo info;
 
 	/* Convert pathname to FSSpec */
-	if (path_to_spec(pathname, &spec) != noErr) return ( -1);
+	if (path_to_spec(pathname, &spec) != noErr)
+		return (-1);
 
 	/* Obtain current finder info of the file */
-	if (FSpGetFInfo(&spec, &info) != noErr) return ( -1);
+	if (FSpGetFInfo(&spec, &info) != noErr)
+		return (-1);
 
 	/* Overwrite creator and type */
 	info.fdCreator = fcreator;
@@ -942,14 +923,13 @@ int fsetfileinfo(char *pathname, OSType fcreator, OSType ftype)
 	return ((err == noErr) ? 0 : -1);
 }
 
-
 #else /* MACH_O_CARBON */
 
 /*
-* Convert refnum+vrefnum+fname into a full file name
-* Store this filename in 'buf' (make sure it is long enough)
-* Note that 'fname' looks to be a "pascal" string
-*/
+ * Convert refnum+vrefnum+fname into a full file name
+ * Store this filename in 'buf' (make sure it is long enough)
+ * Note that 'fname' looks to be a "pascal" string
+ */
 static void refnum_to_name(char *buf, long refnum, short vrefnum, char *fname)
 {
 	DirInfo pb;
@@ -978,7 +958,7 @@ static void refnum_to_name(char *buf, long refnum, short vrefnum, char *fname)
 	while (1)
 	{
 		pb.ioDrDirID = pb.ioDrParID;
-		err = PBGetCatInfoSync((CInfoPBPtr) & pb);
+		err = PBGetCatInfoSync((CInfoPBPtr)&pb);
 		res[i] = ':';
 		i--;
 		for (j = 1; j <= name[0]; j++)
@@ -987,49 +967,50 @@ static void refnum_to_name(char *buf, long refnum, short vrefnum, char *fname)
 		}
 		i -= name[0];
 
-		if (pb.ioDrDirID == fsRtDirID) break;
+		if (pb.ioDrDirID == fsRtDirID)
+			break;
 	}
 
 	/* Extract the result */
-	for (j = 0, i++; res[i]; j++, i++) buf[j] = res[i];
+	for (j = 0, i++; res[i]; j++, i++)
+		buf[j] = res[i];
 	buf[j] = 0;
 }
 
-
 /*
-* Convert a pascal string in place
-*
-* This function may be defined elsewhere, but since it is so
-* small, it is not worth finding the proper function name for
-* all the different platforms.
-*/
+ * Convert a pascal string in place
+ *
+ * This function may be defined elsewhere, but since it is so
+ * small, it is not worth finding the proper function name for
+ * all the different platforms.
+ */
 static void ptocstr(StringPtr src)
 {
 	int i;
 
 	/* Hack -- pointer */
-	char *s = (char*)(src);
+	char *s = (char *)(src);
 
 	/* Hack -- convert the string */
-	for (i = s[0]; i; i--, s++) s[0] = s[1];
+	for (i = s[0]; i; i--, s++)
+		s[0] = s[1];
 
 	/* Hack -- terminate the string */
 	s[0] = '\0';
 }
 
-
 /*
-* Utility routines by Steve Linberg
-*
-* The following three routines (pstrcat, pstrinsert, and PathNameFromDirID)
-* were taken from the Think Reference section called "Getting a Full Pathname"
-* (under the File Manager section).  We need PathNameFromDirID to get the
-* full pathname of the opened savefile, making no assumptions about where it
-* is.
-*
-* I had to hack PathNameFromDirID a little for MetroWerks, but it's awfully
-* nice.
-*/
+ * Utility routines by Steve Linberg
+ *
+ * The following three routines (pstrcat, pstrinsert, and PathNameFromDirID)
+ * were taken from the Think Reference section called "Getting a Full Pathname"
+ * (under the File Manager section).  We need PathNameFromDirID to get the
+ * full pathname of the opened savefile, making no assumptions about where it
+ * is.
+ *
+ * I had to hack PathNameFromDirID a little for MetroWerks, but it's awfully
+ * nice.
+ */
 static void pstrcat(StringPtr dst, StringPtr src)
 {
 	/* copy string in */
@@ -1039,10 +1020,9 @@ static void pstrcat(StringPtr dst, StringPtr src)
 	*dst += *src;
 }
 
-
 /*
-* pstrinsert - insert string 'src' at beginning of string 'dst'
-*/
+ * pstrinsert - insert string 'src' at beginning of string 'dst'
+ */
 static void pstrinsert(StringPtr dst, StringPtr src)
 {
 	/* make room for new string */
@@ -1054,7 +1034,6 @@ static void pstrinsert(StringPtr dst, StringPtr src)
 	/* adjust length byte */
 	*dst += *src;
 }
-
 
 static void PathNameFromDirID(long dirID, short vRefNum, StringPtr fullPathName)
 {
@@ -1073,16 +1052,14 @@ static void PathNameFromDirID(long dirID, short vRefNum, StringPtr fullPathName)
 		block.dirInfo.ioFDirIndex = -1;
 		block.dirInfo.ioDrDirID = block.dirInfo.ioDrParID;
 		err = PBGetCatInfoSync(&block);
-		pstrcat(directoryName, (StringPtr)"\p:");
+		pstrcat(directoryName, (StringPtr) "\p:");
 		pstrinsert(fullPathName, directoryName);
-		if (block.dirInfo.ioDrDirID == 2) break;
+		if (block.dirInfo.ioDrDirID == 2)
+			break;
 	}
 }
 
 #endif /* MACH_O_CARBON */
-
-
-
 
 /*
  * Center a rectangle inside another rectangle
@@ -1101,7 +1078,6 @@ static void center_rect(Rect *r, Rect *s)
 	r->bottom += dy;
 }
 
-
 /*
  * Activate a given window, if necessary
  */
@@ -1111,13 +1087,13 @@ static void activate(WindowPtr w)
 	if (active != w)
 	{
 		/* Activate */
-		if (w) SetPort(GetWindowPort(w));
+		if (w)
+			SetPort(GetWindowPort(w));
 
 		/* Remember */
 		active = w;
 	}
 }
-
 
 /*
  * Display a warning message
@@ -1129,11 +1105,13 @@ static void mac_warning(cptr warning)
 
 	/* Limit of 250 chars */
 	len = strlen(warning);
-	if (len > 250) len = 250;
+	if (len > 250)
+		len = 250;
 
 	/* Make a "Pascal" string */
 	text[0] = len;
-	for (i = 0; i < len; i++) text[i + 1] = warning[i];
+	for (i = 0; i < len; i++)
+		text[i + 1] = warning[i];
 
 	/* Prepare the dialog box values */
 	ParamText(text, "\p", "\p", "\p");
@@ -1141,8 +1119,6 @@ static void mac_warning(cptr warning)
 	/* Display the Alert, wait for Okay */
 	Alert(129, 0L);
 }
-
-
 
 /*** Some generic functions ***/
 
@@ -1161,7 +1137,6 @@ static void term_data_color(term_data *td, int a)
 		td->last = a;
 	}
 }
-
 
 /*
  * Hack -- Apply and Verify the "font" info
@@ -1182,7 +1157,6 @@ static void term_data_check_font(term_data *td)
 
 	WindowPtr old = active;
 
-
 	/* Activate */
 	activate(td->w);
 
@@ -1198,7 +1172,7 @@ static void term_data_check_font(term_data *td)
 	td->font_mono = TRUE;
 
 	/* Extract the font sizing values XXX XXX XXX */
-	td->font_wid = CharWidth('@');  /* info.widMax; */
+	td->font_wid = CharWidth('@'); /* info.widMax; */
 	td->font_hgt = info.ascent + info.descent;
 	td->font_o_x = 0;
 	td->font_o_y = info.ascent;
@@ -1207,10 +1181,12 @@ static void term_data_check_font(term_data *td)
 	for (i = 33; i < 127; i++)
 	{
 		/* Hack -- notice non-mono-space */
-		if (td->font_wid != CharWidth(i)) td->font_mono = FALSE;
+		if (td->font_wid != CharWidth(i))
+			td->font_mono = FALSE;
 
 		/* Hack -- collect largest width */
-		if (td->font_wid < CharWidth(i)) td->font_wid = CharWidth(i);
+		if (td->font_wid < CharWidth(i))
+			td->font_wid = CharWidth(i);
 	}
 
 	/* Set default offsets */
@@ -1218,13 +1194,14 @@ static void term_data_check_font(term_data *td)
 	td->tile_o_y = td->font_o_y;
 
 	/* Set default tile size */
-	if (td->tile_wid == 0) td->tile_wid = td->font_wid;
-	if (td->tile_hgt == 0) td->tile_hgt = td->font_hgt;
+	if (td->tile_wid == 0)
+		td->tile_wid = td->font_wid;
+	if (td->tile_hgt == 0)
+		td->tile_hgt = td->font_hgt;
 
 	/* Re-activate the old window */
 	activate(old);
 }
-
 
 /*
  * Hack -- Apply and Verify the "size" info
@@ -1242,8 +1219,10 @@ static void term_data_check_size(term_data *td)
 #else
 
 		/* Enforce minimal size */
-		if (td->cols < 80) td->cols = 80;
-		if (td->rows < 24) td->rows = 24;
+		if (td->cols < 80)
+			td->cols = 80;
+		if (td->rows < 24)
+			td->rows = 24;
 
 #endif /* !ALLOW_BIG_SCREEN */
 	}
@@ -1251,25 +1230,33 @@ static void term_data_check_size(term_data *td)
 	/* Information windows can be much smaller */
 	else
 	{
-		if (td->cols < 1) td->cols = 1;
-		if (td->rows < 1) td->rows = 1;
+		if (td->cols < 1)
+			td->cols = 1;
+		if (td->rows < 1)
+			td->rows = 1;
 	}
 
 	/* Enforce maximal sizes */
-	if (td->cols > 255) td->cols = 255;
-	if (td->rows > 255) td->rows = 255;
+	if (td->cols > 255)
+		td->cols = 255;
+	if (td->rows > 255)
+		td->rows = 255;
 
 	/* Minimal tile size */
-	if (td->tile_wid < td->font_wid) td->tile_wid = td->font_wid;
-	if (td->tile_hgt < td->font_hgt) td->tile_hgt = td->font_hgt;
+	if (td->tile_wid < td->font_wid)
+		td->tile_wid = td->font_wid;
+	if (td->tile_hgt < td->font_hgt)
+		td->tile_hgt = td->font_hgt;
 
 	/* Default tile offsets */
 	td->tile_o_x = (td->tile_wid - td->font_wid) / 2;
 	td->tile_o_y = (td->tile_hgt - td->font_hgt) / 2;
 
 	/* Minimal tile offsets */
-	if (td->tile_o_x < 0) td->tile_o_x = 0;
-	if (td->tile_o_y < 0) td->tile_o_y = 0;
+	if (td->tile_o_x < 0)
+		td->tile_o_x = 0;
+	if (td->tile_o_y < 0)
+		td->tile_o_y = 0;
 
 	/* Apply font offsets */
 	td->tile_o_x += td->font_o_x;
@@ -1318,21 +1305,22 @@ static void term_data_check_size(term_data *td)
 	td->t->higher_pict = FALSE;
 	td->t->always_pict = FALSE;
 
-
 	/* Handle graphics */
 	if (use_graphics)
 	{
 		/* Use higher pict whenever possible */
-		if (td->font_mono) td->t->higher_pict = TRUE;
+		if (td->font_mono)
+			td->t->higher_pict = TRUE;
 
 		/* Use always_pict only when necessary */
-		else td->t->always_pict = TRUE;
+		else
+			td->t->always_pict = TRUE;
 	}
 
 	/* Fake mono-space */
 	if (!td->font_mono ||
-	                (td->font_wid != td->tile_wid) ||
-	                (td->font_hgt != td->tile_hgt))
+		(td->font_wid != td->tile_wid) ||
+		(td->font_hgt != td->tile_hgt))
 	{
 		/*
 		 * Handle fake monospace
@@ -1340,11 +1328,11 @@ static void term_data_check_size(term_data *td)
 		 * pelpel: This is SLOW. Couldn't we use CharExtra
 		 * and SpaceExtra for monospaced fonts?
 		 */
-		if (td->t->higher_pict) td->t->higher_pict = FALSE;
+		if (td->t->higher_pict)
+			td->t->higher_pict = FALSE;
 		td->t->always_pict = TRUE;
 	}
 }
-
 
 /*
  * Hack -- resize a term_data
@@ -1361,8 +1349,6 @@ static void term_data_resize(term_data *td)
 	 */
 	SizeWindow(td->w, td->size_wid, td->size_hgt, 0);
 }
-
-
 
 /*
  * Hack -- redraw a term_data
@@ -1390,38 +1376,36 @@ static void term_data_redraw(term_data *td)
 	ValidWindowRect(td->w, GetPortBounds(GetWindowPort(td->w), &tRect));
 }
 
-
 /*
  * Graphics support
  */
 
 /* Set by Term_xtra_mac_react */
 #ifdef MACH_O_CARBON
-static CFStringRef pict_id; 		/* PICT id of image tiles */
+static CFStringRef pict_id; /* PICT id of image tiles */
 #else
-static int pict_id; 		/* PICT id of image tiles */
+static int pict_id; /* PICT id of image tiles */
 #endif /* MACH_O_CARBON */
 
-static int graf_width; 	/* Width of a tile in pixels */
-static int graf_height; 	/* Height of a tile in pixels */
+static int graf_width;	/* Width of a tile in pixels */
+static int graf_height; /* Height of a tile in pixels */
 
 /* Calculated by PICT loading code */
-static int pict_cols; 	/* Number of columns in tiles */
-static int pict_rows; 	/* Number of rows in tiles */
+static int pict_cols; /* Number of columns in tiles */
+static int pict_rows; /* Number of rows in tiles */
 
 /* Available graphics modes */
-#define GRAF_MODE_NONE	0	/* plain ASCII */
-#define GRAF_MODE_8X8	1	/* 8x8 tiles */
-#define GRAF_MODE_16X16	2	/* 16x16 tiles */
-#define GRAF_MODE_32X32	3	/* 32x32 tiles */
+#define GRAF_MODE_NONE 0  /* plain ASCII */
+#define GRAF_MODE_8X8 1	  /* 8x8 tiles */
+#define GRAF_MODE_16X16 2 /* 16x16 tiles */
+#define GRAF_MODE_32X32 3 /* 32x32 tiles */
 
-static int graf_mode = GRAF_MODE_NONE; 		/* current graphics mode */
-static int graf_mode_req = GRAF_MODE_NONE; 	/* requested graphics mode */
+static int graf_mode = GRAF_MODE_NONE;	   /* current graphics mode */
+static int graf_mode_req = GRAF_MODE_NONE; /* requested graphics mode */
 
-#define TR_NONE	0	/* No transparency */
-#define TR_OVER 1	/* Overwriting with transparent black pixels */
-static int transparency_mode = TR_NONE; 	/* types of transparency effect */
-
+#define TR_NONE 0						/* No transparency */
+#define TR_OVER 1						/* Overwriting with transparent black pixels */
+static int transparency_mode = TR_NONE; /* types of transparency effect */
 
 /*
  * Forward Declare
@@ -1442,12 +1426,10 @@ struct FrameRec
 	PixMapPtr framePix;
 };
 
-
 /*
  * The global picture data
  */
 static FrameRec *frameP = NULL;
-
 
 /*
  * Lock a frame
@@ -1463,7 +1445,6 @@ static void BenSWLockFrame(FrameRec *srcFrameP)
 	srcFrameP->framePix = (PixMapPtr)(*(Handle)pixMapH);
 }
 
-
 /*
  * Unlock a frame
  */
@@ -1478,8 +1459,6 @@ static void BenSWUnlockFrame(FrameRec *srcFrameP)
 	srcFrameP->framePix = NULL;
 }
 
-
-
 #ifdef MACH_O_CARBON
 
 /* Moving graphics resources into data fork -- pelpel */
@@ -1492,17 +1471,18 @@ static void BenSWUnlockFrame(FrameRec *srcFrameP)
  * e.g. get_resource_spec(CFSTR("8x8"), CFSTR("png"), &spec);
  */
 static Boolean get_resource_spec(
-        CFStringRef base_name, CFStringRef type_name, FSSpec *spec)
+	CFStringRef base_name, CFStringRef type_name, FSSpec *spec)
 {
 	CFURLRef res_url;
 	FSRef ref;
 
 	/* Find the tile resource specified in the current bundle */
 	res_url = CFBundleCopyResourceURL(
-	                  CFBundleGetMainBundle(), base_name, type_name, NULL);
+		CFBundleGetMainBundle(), base_name, type_name, NULL);
 
 	/* Oops */
-	if (res_url == NULL) return (false);
+	if (res_url == NULL)
+		return (false);
 
 	/* Convert CFURL to FSRef */
 	(void)CFURLGetFSRef(res_url, &ref);
@@ -1517,7 +1497,6 @@ static Boolean get_resource_spec(
 	return (true);
 }
 
-
 /*
  * (QuickTime)
  * Create a off-screen GWorld from contents of a file specified by a FSSpec.
@@ -1526,7 +1505,7 @@ static Boolean get_resource_spec(
  * Globals updated: pict_rows, pict_cols.
  */
 static OSErr create_gworld_from_spec(
-        GWorldPtr *tile_gw, FSSpec *tile_spec)
+	GWorldPtr *tile_gw, FSSpec *tile_spec)
 {
 	OSErr err;
 	GraphicsImportComponent gi;
@@ -1539,7 +1518,8 @@ static OSErr create_gworld_from_spec(
 	err = GetGraphicsImporterForFile(tile_spec, &gi);
 
 	/* Oops */
-	if (err != noErr) return (err);
+	if (err != noErr)
+		return (err);
 
 	/* Get depth */
 	depth = data[0].pixelDepth;
@@ -1561,7 +1541,8 @@ static OSErr create_gworld_from_spec(
 	err = NewGWorld(&gw, depth, &r, NULL, gdh, noNewDevice);
 
 	/* Oops */
-	if (err != noErr) return (err);
+	if (err != noErr)
+		return (err);
 
 	/* Save the pointer to the GWorld */
 	*tile_gw = gw;
@@ -1597,7 +1578,7 @@ static OSErr create_gworld_from_spec(
 #else /* MACH_O_CARBON */
 
 static OSErr BenSWCreateGWorldFromPict(
-        GWorldPtr *pictGWorld, PicHandle pictH)
+	GWorldPtr *pictGWorld, PicHandle pictH)
 {
 	OSErr err;
 	GWorldPtr saveGWorld;
@@ -1630,7 +1611,8 @@ static OSErr BenSWCreateGWorldFromPict(
 	err = NewGWorld(&tempGWorld, depth, &pictRect, nil, theGDH, noNewDevice);
 
 	/* Oops */
-	if (err != noErr) return (err);
+	if (err != noErr)
+		return (err);
 
 	/* Save pointer */
 	*pictGWorld = tempGWorld;
@@ -1656,7 +1638,6 @@ static OSErr BenSWCreateGWorldFromPict(
 
 #endif /* MACH_O_CARBON */
 
-
 /*
  * Init the global "frameP"
  */
@@ -1672,15 +1653,14 @@ static errr globe_init(void)
 	PicHandle newPictH;
 #endif /* MACH_O_CARBON */
 
-
 	/* Use window XXX XXX XXX */
 	SetPort(GetWindowPort(data[0].w));
-
 
 #ifdef MACH_O_CARBON
 
 	/* Get the tile resources */
-	if (!get_resource_spec(pict_id, CFSTR("png"), &pict_spec)) return ( -1);
+	if (!get_resource_spec(pict_id, CFSTR("png"), &pict_spec))
+		return (-1);
 
 	/* Create GWorld */
 	err = create_gworld_from_spec(&tempPictGWorldP, &pict_spec);
@@ -1688,7 +1668,8 @@ static errr globe_init(void)
 #else /* MACH_O_CARBON */
 
 	/* Get the pict resource */
-	if ((newPictH = GetPicture(pict_id)) == 0) return ( -1);
+	if ((newPictH = GetPicture(pict_id)) == 0)
+		return (-1);
 
 	/* Create GWorld */
 	err = BenSWCreateGWorldFromPict(&tempPictGWorldP, newPictH);
@@ -1699,13 +1680,15 @@ static errr globe_init(void)
 #endif /* MACH_O_CARBON */
 
 	/* Error */
-	if (err != noErr) return (err);
+	if (err != noErr)
+		return (err);
 
 	/* Create the frame */
-	frameP = (FrameRec*)NewPtrClear((Size)sizeof(FrameRec));
+	frameP = (FrameRec *)NewPtrClear((Size)sizeof(FrameRec));
 
 	/* Analyze result */
-	if (frameP == NULL) return ( -1);
+	if (frameP == NULL)
+		return (-1);
 
 	/* Save GWorld */
 	frameP->framePort = tempPictGWorldP;
@@ -1716,7 +1699,6 @@ static errr globe_init(void)
 	/* Success */
 	return (noErr);
 }
-
 
 /*
  * Nuke the global "frameP"
@@ -1746,14 +1728,13 @@ static errr globe_nuke(void)
 	return (0);
 }
 
-
 #ifdef USE_ASYNC_SOUND
 
 /*
  * Asynchronous sound player - completely revised (beta)
  */
 #if defined(USE_QT_SOUND) && !defined(MACH_O_CARBON)
-# undef USE_QT_SOUND
+#undef USE_QT_SOUND
 #endif /* USE_QT_SOUND && !MACH_O_CARBON */
 
 /*
@@ -1762,7 +1743,7 @@ static errr globe_nuke(void)
  * Was: 20, but I don't think we need 20 sound effects playing
  * simultaneously :) -- pelpel
  */
-#define MAX_CHANNELS		8
+#define MAX_CHANNELS 8
 
 /*
  * A pool of sound channels
@@ -1784,17 +1765,16 @@ static SndListHandle samples[SOUND_MAX];
  */
 static SInt16 sample_refs[SOUND_MAX];
 
-#define SOUND_VOLUME_MIN	0	/* Default minimum sound volume */
-#define SOUND_VOLUME_MAX	255	/* Default maximum sound volume */
-#define VOLUME_MIN			0	/* Minimum sound volume in % */
-#define VOLUME_MAX			100	/* Maximum sound volume in % */
-#define VOLUME_INC			5	/* Increment sound volume in % */
+#define SOUND_VOLUME_MIN 0	 /* Default minimum sound volume */
+#define SOUND_VOLUME_MAX 255 /* Default maximum sound volume */
+#define VOLUME_MIN 0		 /* Minimum sound volume in % */
+#define VOLUME_MAX 100		 /* Maximum sound volume in % */
+#define VOLUME_INC 5		 /* Increment sound volume in % */
 
 /*
  * I'm just too lazy to write a panel for this XXX XXX
  */
 static int sound_volume = SOUND_VOLUME_MAX;
-
 
 #ifdef USE_QT_SOUND
 
@@ -1823,7 +1803,8 @@ static void load_sounds(void)
 	err = EnterMovies();
 
 	/* Error */
-	if (err != noErr) return;
+	if (err != noErr)
+		return;
 
 	/*
 	 * This loop may take a while depending on the count and size of samples
@@ -1846,10 +1827,11 @@ static void load_sounds(void)
 
 		/* Allocate CFString with the name of sound event to be processed */
 		name = CFStringCreateWithCString(NULL, angband_sound_name[i],
-		                                 kTextEncodingUS_ASCII);
+										 kTextEncodingUS_ASCII);
 
 		/* Error */
-		if (name == NULL) continue;
+		if (name == NULL)
+			continue;
 
 		/* Find sound sample resource with the same name */
 		res = get_resource_spec(name, CFSTR("wav"), &spec);
@@ -1858,37 +1840,42 @@ static void load_sounds(void)
 		CFRelease(name);
 
 		/* Error */
-		if (!res) continue;
+		if (!res)
+			continue;
 
 		/* Open the sound file */
 		err = OpenMovieFile(&spec, &file_id, fsRdPerm);
 
 		/* Error */
-		if (err != noErr) continue;
+		if (err != noErr)
+			continue;
 
 		/* Create Movie from the file */
 		err = NewMovieFromFile(&movie, file_id, &res_id, movie_name,
-		                       newMovieActive, NULL);
+							   newMovieActive, NULL);
 
 		/* Error */
-		if (err != noErr) goto close_file;
+		if (err != noErr)
+			goto close_file;
 
 		/* Get the first track of the movie */
 		track = GetMovieIndTrackType(movie, 1, AudioMediaCharacteristic,
-		                             movieTrackCharacteristic | movieTrackEnabledOnly );
+									 movieTrackCharacteristic | movieTrackEnabledOnly);
 
 		/* Error */
-		if (track == NULL) goto close_movie;
+		if (track == NULL)
+			goto close_movie;
 
 		/* Allocate a handle to store sample */
 		h = NewHandle(0);
 
 		/* Error */
-		if (h == NULL) goto close_track;
+		if (h == NULL)
+			goto close_track;
 
 		/* Dump the sample into the handle */
 		err = PutMovieIntoTypedHandle(movie, track, soundListRsrc, h, 0,
-		                              GetTrackDuration(track), 0L, NULL);
+									  GetTrackDuration(track), 0L, NULL);
 
 		/* Success */
 		if (err == noErr)
@@ -1905,15 +1892,15 @@ static void load_sounds(void)
 		}
 
 		/* Free the track */
-close_track:
+	close_track:
 		DisposeMovieTrack(track);
 
 		/* Free the movie */
-close_movie:
+	close_movie:
 		DisposeMovie(movie);
 
 		/* Close the movie file */
-close_file:
+	close_file:
 		CloseMovieFile(file_id);
 	}
 
@@ -1924,25 +1911,24 @@ close_file:
 #else /* USE_QT_SOUND */
 
 /*
-* Return a handle of 'snd ' resource given Angband sound event number,
-* or NULL if it isn't found.
-*
-* Globals referenced: angband_sound_name[] (variable.c)
-*/
+ * Return a handle of 'snd ' resource given Angband sound event number,
+ * or NULL if it isn't found.
+ *
+ * Globals referenced: angband_sound_name[] (variable.c)
+ */
 static SndListHandle find_sound(int num)
 {
-Str255 sound;
+	Str255 sound;
 
-/* Get the proper sound name */
-strnfmt((char*)sound + 1, 255, "%.16s.wav", angband_sound_name[num]);
-sound[0] = strlen((char*)sound + 1);
+	/* Get the proper sound name */
+	strnfmt((char *)sound + 1, 255, "%.16s.wav", angband_sound_name[num]);
+	sound[0] = strlen((char *)sound + 1);
 
-/* Obtain resource XXX XXX XXX */
-return ((SndListHandle)GetNamedResource('snd ', sound));
+	/* Obtain resource XXX XXX XXX */
+	return ((SndListHandle)GetNamedResource('snd ', sound));
 }
 
 #endif /* USE_QT_SOUND */
-
 
 /*
  * Clean up sound support - to be called when the game exits.
@@ -1954,7 +1940,8 @@ static void cleanup_sound(void)
 	int i;
 
 	/* No need to clean it up */
-	if (!channel_initialised) return;
+	if (!channel_initialised)
+		return;
 
 	/* Dispose channels */
 	for (i = 0; i < MAX_CHANNELS; i++)
@@ -1976,16 +1963,17 @@ static void cleanup_sound(void)
 #ifndef USE_QT_SOUND
 
 		/* Release it */
-		if (samples[i]) ReleaseResource((Handle)samples[i]);
+		if (samples[i])
+			ReleaseResource((Handle)samples[i]);
 
 #else
-/* Free handle */
-		if (samples[i]) DisposeHandle((Handle)samples[i]);
+		/* Free handle */
+		if (samples[i])
+			DisposeHandle((Handle)samples[i]);
 
 #endif /* !USE_QT_SOUND */
 	}
 }
-
 
 /*
  * Play sound effects asynchronously -- pelpel
@@ -2018,7 +2006,6 @@ static void play_sound(int num, int vol)
 	static int next_chan;
 	static SInt16 channel_occupants[MAX_CHANNELS];
 	static SndCommand volume_cmd, quiet_cmd;
-
 
 	/* Initialise sound channels */
 	if (!channel_initialised)
@@ -2069,7 +2056,8 @@ static void play_sound(int num, int vol)
 	}
 
 	/* Paranoia */
-	if ((num <= 0) || (num >= SOUND_MAX)) return;
+	if ((num <= 0) || (num >= SOUND_MAX))
+		return;
 
 	/* Prepare volume command */
 	volume_cmd.param2 = (SInt16)((vol << 4) | vol);
@@ -2098,7 +2086,8 @@ static void play_sound(int num, int vol)
 #endif /* USE_QT_SOUND */
 
 		/* Sample not available */
-		if (h == NULL) return;
+		if (h == NULL)
+			return;
 
 #ifndef USE_QT_SOUND
 
@@ -2168,16 +2157,13 @@ static void play_sound(int num, int vol)
 
 	/* Schedule next channel (round robin) */
 	next_chan++;
-	if (next_chan >= MAX_CHANNELS) next_chan = 0;
+	if (next_chan >= MAX_CHANNELS)
+		next_chan = 0;
 }
 
 #endif /* USE_ASYNC_SOUND */
 
-
-
-
 /*** Support for the "z-term.c" package ***/
-
 
 /*
  * Initialize a new Term
@@ -2189,7 +2175,7 @@ static void play_sound(int num, int vol)
  */
 static void Term_init_mac(term *t)
 {
-	term_data *td = (term_data*)(t->data);
+	term_data *td = (term_data *)(t->data);
 	WindowAttributes wattrs;
 	OSStatus err;
 
@@ -2202,23 +2188,24 @@ static void Term_init_mac(term *t)
 	wattrs = kWindowCloseBoxAttribute | kWindowCollapseBoxAttribute;
 
 	/* Information windows are resizable */
-	if (td != &data[0]) wattrs |= kWindowResizableAttribute;
+	if (td != &data[0])
+		wattrs |= kWindowResizableAttribute;
 
 #else
 
 	/* Big screen - every window has close, collapse and resize boxes */
 	wattrs = kWindowCloseBoxAttribute |
-	         kWindowCollapseBoxAttribute |
-	         kWindowResizableAttribute;
+			 kWindowCollapseBoxAttribute |
+			 kWindowResizableAttribute;
 
 #endif /* !ALLOW_BIG_SCREEN */
 
 	/* Make the window  */
 	err = CreateNewWindow(
-	              kDocumentWindowClass,
-	              wattrs,
-	              &td->r,
-	              &td->w);
+		kDocumentWindowClass,
+		wattrs,
+		&td->r,
+		&td->w);
 
 	/*
 	 * XXX XXX Although the original main-mac.c doesn't perform error
@@ -2240,7 +2227,6 @@ static void Term_init_mac(term *t)
 
 	/* Resize the window */
 	term_data_resize(td);
-
 
 	/* Prepare the colors (real colors) */
 	RGBBackColor(&black);
@@ -2309,7 +2295,7 @@ static void Term_init_mac(term *t)
 	if (td->mapped)
 	{
 		TransitionWindow(td->w,
-		                 kWindowZoomTransitionEffect, kWindowShowTransitionAction, NULL);
+						 kWindowZoomTransitionEffect, kWindowShowTransitionAction, NULL);
 	}
 
 	/* Hack -- set "mapped" flag */
@@ -2319,8 +2305,6 @@ static void Term_init_mac(term *t)
 	td->last = -1;
 }
 
-
-
 /*
  * Nuke an old Term
  */
@@ -2328,8 +2312,6 @@ static void Term_nuke_mac(term *t)
 {
 	/* XXX */
 }
-
-
 
 /*
  * Unused
@@ -2340,17 +2322,14 @@ static errr Term_user_mac(int n)
 	return (0);
 }
 
-
-
 /*
  * React to changes
  */
 static errr Term_xtra_mac_react(void)
 {
-	term_data *td = (term_data*)(Term->data);
+	term_data *td = (term_data *)(Term->data);
 
 	int i;
-
 
 	/* Reset color */
 	td->last = -1;
@@ -2371,14 +2350,12 @@ static errr Term_xtra_mac_react(void)
 		color_info[i].blue = (bv | (bv << 8));
 	}
 
-
 	/* Handle sound */
 	if (use_sound != arg_sound)
 	{
 		/* Apply request */
 		use_sound = arg_sound;
 	}
-
 
 	/* Handle graphics */
 	if (graf_mode_req != graf_mode)
@@ -2397,11 +2374,11 @@ static errr Term_xtra_mac_react(void)
 		{
 			/* ASCII - no graphics whatsoever */
 		case GRAF_MODE_NONE:
-			{
-				use_graphics = arg_graphics = FALSE;
-				transparency_mode = TR_NONE;
-				break;
-			}
+		{
+			use_graphics = arg_graphics = FALSE;
+			transparency_mode = TR_NONE;
+			break;
+		}
 
 			/*
 			 * 8x8 tiles (PICT id 1001)
@@ -2409,18 +2386,18 @@ static errr Term_xtra_mac_react(void)
 			 * "old" graphics definitions
 			 */
 		case GRAF_MODE_8X8:
-			{
-				use_graphics = arg_graphics = TRUE;
-				ANGBAND_GRAF = "old";
-				transparency_mode = TR_NONE;
+		{
+			use_graphics = arg_graphics = TRUE;
+			ANGBAND_GRAF = "old";
+			transparency_mode = TR_NONE;
 #ifdef MACH_O_CARBON
-				pict_id = CFSTR("8x8");
+			pict_id = CFSTR("8x8");
 #else
-				pict_id = 1001;
+			pict_id = 1001;
 #endif /* MACH_O_CARBON */
-				graf_width = graf_height = 8;
-				break;
-			}
+			graf_width = graf_height = 8;
+			break;
+		}
 
 			/*
 			 * 16x16 tiles (images: PICT id 1002, masks: PICT id 1003)
@@ -2428,18 +2405,18 @@ static errr Term_xtra_mac_react(void)
 			 * "new" graphics definitions
 			 */
 		case GRAF_MODE_16X16:
-			{
-				use_graphics = arg_graphics = TRUE;
-				ANGBAND_GRAF = "new";
-				transparency_mode = TR_OVER;
+		{
+			use_graphics = arg_graphics = TRUE;
+			ANGBAND_GRAF = "new";
+			transparency_mode = TR_OVER;
 #ifdef MACH_O_CARBON
-				pict_id = CFSTR("16x16");
+			pict_id = CFSTR("16x16");
 #else
-				pict_id = 1002;
+			pict_id = 1002;
 #endif /* MACH_O_CARBON */
-				graf_width = graf_height = 16;
-				break;
-			}
+			graf_width = graf_height = 16;
+			break;
+		}
 
 			/*
 			 * 32x32 tiles (images: PICT id 1004)
@@ -2448,18 +2425,18 @@ static errr Term_xtra_mac_react(void)
 			 * Vanilla-specific
 			 */
 		case GRAF_MODE_32X32:
-			{
-				use_graphics = arg_graphics = TRUE;
-				ANGBAND_GRAF = "david";
-				transparency_mode = TR_OVER;
+		{
+			use_graphics = arg_graphics = TRUE;
+			ANGBAND_GRAF = "david";
+			transparency_mode = TR_OVER;
 #ifdef MACH_O_CARBON
-				pict_id = CFSTR("32x32");
+			pict_id = CFSTR("32x32");
 #else
-				pict_id = 1004;
+			pict_id = 1004;
 #endif /* MACH_O_CARBON */
-				graf_width = graf_height = 32;
-				break;
-			}
+			graf_width = graf_height = 32;
+			break;
+		}
 		}
 
 		/* load tiles and setup GWorlds if tiles are requested */
@@ -2499,13 +2476,12 @@ static errr Term_xtra_mac_react(void)
 	return (0);
 }
 
-
 /*
  * Do a "special thing"
  */
 static errr Term_xtra_mac(int n, int v)
 {
-	term_data *td = (term_data*)(Term->data);
+	term_data *td = (term_data *)(Term->data);
 
 	Rect r;
 
@@ -2514,239 +2490,240 @@ static errr Term_xtra_mac(int n, int v)
 	{
 		/* Make a noise */
 	case TERM_XTRA_NOISE:
-		{
-			/* Make a noise */
-			SysBeep(1);
+	{
+		/* Make a noise */
+		SysBeep(1);
 
-			/* Success */
-			return (0);
-		}
+		/* Success */
+		return (0);
+	}
 
 		/* Make a sound */
 	case TERM_XTRA_SOUND:
-		{
+	{
 #ifndef USE_ASYNC_SOUND
 
-			/*
-			 * This may not be your choice, but much safer and much less
-			 * resource hungry.  Existing implementations can quite easily
-			 * crash, by starting asynchronous playing and immediately
-			 * unlocking and releasing the sound data just started playing...
-			 * -- pelpel
-			 */
-			Handle handle;
-			Str255 sound;
+		/*
+		 * This may not be your choice, but much safer and much less
+		 * resource hungry.  Existing implementations can quite easily
+		 * crash, by starting asynchronous playing and immediately
+		 * unlocking and releasing the sound data just started playing...
+		 * -- pelpel
+		 */
+		Handle handle;
+		Str255 sound;
 
-			/* Get the proper sound name */
-			strnfmt((char*)sound + 1, 255, "%.16s.wav", angband_sound_name[v]);
-			sound[0] = strlen((char*)sound + 1);
+		/* Get the proper sound name */
+		strnfmt((char *)sound + 1, 255, "%.16s.wav", angband_sound_name[v]);
+		sound[0] = strlen((char *)sound + 1);
 
-			/* Obtain resource XXX XXX XXX */
-			handle = GetNamedResource('snd ', sound);
+		/* Obtain resource XXX XXX XXX */
+		handle = GetNamedResource('snd ', sound);
 
-			/* Oops -- it is a failure, but we return 0 anyway */
-			if (handle == NULL) return (0);
+		/* Oops -- it is a failure, but we return 0 anyway */
+		if (handle == NULL)
+			return (0);
 
-			/* Load and Lock */
-			LoadResource(handle);
-			HLock(handle);
+		/* Load and Lock */
+		LoadResource(handle);
+		HLock(handle);
 
-			/* Play sound (wait for completion) */
-			SndPlay(NULL, (SndListHandle)handle, FALSE);
+		/* Play sound (wait for completion) */
+		SndPlay(NULL, (SndListHandle)handle, FALSE);
 
-			/* Unlock and release */
-			HUnlock(handle);
-			ReleaseResource(handle);
+		/* Unlock and release */
+		HUnlock(handle);
+		ReleaseResource(handle);
 
 #else /* !USE_ASYNC_SOUND */
 
-			/* Play sound */
-			play_sound(v, sound_volume);
+		/* Play sound */
+		play_sound(v, sound_volume);
 
 #endif /* !USE_ASYNC_SOUND */
 
-			/* Success */
-			return (0);
-		}
+		/* Success */
+		return (0);
+	}
 
 		/* Process random events */
 	case TERM_XTRA_BORED:
-		{
-			/* Process an event */
-			(void)CheckEvents(FALSE);
+	{
+		/* Process an event */
+		(void)CheckEvents(FALSE);
 
-			/* Success */
-			return (0);
-		}
+		/* Success */
+		return (0);
+	}
 
 		/* Process pending events */
 	case TERM_XTRA_EVENT:
-		{
-			/* Process an event */
-			(void)CheckEvents(v);
+	{
+		/* Process an event */
+		(void)CheckEvents(v);
 
-			/* Success */
-			return (0);
-		}
+		/* Success */
+		return (0);
+	}
 
 		/* Flush all pending events (if any) */
 	case TERM_XTRA_FLUSH:
-		{
-			/* Hack -- flush all events */
-			while (CheckEvents(FALSE)) /* loop */;
+	{
+		/* Hack -- flush all events */
+		while (CheckEvents(FALSE)) /* loop */
+			;
 
-			/* Success */
-			return (0);
-		}
+		/* Success */
+		return (0);
+	}
 
 		/* Hack -- Change the "soft level" */
 	case TERM_XTRA_LEVEL:
-		{
-			/* Activate if requested */
-			if (v) activate(td->w);
+	{
+		/* Activate if requested */
+		if (v)
+			activate(td->w);
 
-			/* Success */
-			return (0);
-		}
+		/* Success */
+		return (0);
+	}
 
 		/* Clear the screen */
 	case TERM_XTRA_CLEAR:
-		{
-			Rect portRect;
+	{
+		Rect portRect;
 
-			/* Get current Rect */
-			GetPortBounds(GetWindowPort(td->w), &portRect);
+		/* Get current Rect */
+		GetPortBounds(GetWindowPort(td->w), &portRect);
 
-			/* No clipping XXX XXX XXX */
-			ClipRect(&portRect);
+		/* No clipping XXX XXX XXX */
+		ClipRect(&portRect);
 
-			/* Erase the window */
-			EraseRect(&portRect);
+		/* Erase the window */
+		EraseRect(&portRect);
 
-			/* Set the color */
-			term_data_color(td, TERM_WHITE);
+		/* Set the color */
+		term_data_color(td, TERM_WHITE);
 
-			/* Frame the window in white */
-			MoveTo(0, 0);
-			LineTo(0, td->size_hgt - 1);
-			LineTo(td->size_wid - 1, td->size_hgt - 1);
-			LineTo(td->size_wid - 1, 0);
+		/* Frame the window in white */
+		MoveTo(0, 0);
+		LineTo(0, td->size_hgt - 1);
+		LineTo(td->size_wid - 1, td->size_hgt - 1);
+		LineTo(td->size_wid - 1, 0);
 
-			/* Clip to the new size */
-			r.left = portRect.left + td->size_ow1;
-			r.top = portRect.top + td->size_oh1;
-			r.right = portRect.right - td->size_ow2;
-			r.bottom = portRect.bottom - td->size_oh2;
-			ClipRect(&r);
+		/* Clip to the new size */
+		r.left = portRect.left + td->size_ow1;
+		r.top = portRect.top + td->size_oh1;
+		r.right = portRect.right - td->size_ow2;
+		r.bottom = portRect.bottom - td->size_oh2;
+		ClipRect(&r);
 
-			/* Success */
-			return (0);
-		}
+		/* Success */
+		return (0);
+	}
 
 		/* React to changes */
 	case TERM_XTRA_REACT:
-		{
-			/* React to changes */
-			return (Term_xtra_mac_react());
-		}
+	{
+		/* React to changes */
+		return (Term_xtra_mac_react());
+	}
 
 		/* Delay (milliseconds) */
 	case TERM_XTRA_DELAY:
+	{
+		/*
+		 * WaitNextEvent relinquishes CPU as well as
+		 * induces a screen refresh on OS X
+		 */
+
+		/* If needed */
+		if (v > 0)
 		{
+			EventRecord tmp;
+			UInt32 ticks;
+
+			/* Convert millisecs to ticks */
+			ticks = (v * 60L) / 1000;
+
 			/*
-			 * WaitNextEvent relinquishes CPU as well as
-			 * induces a screen refresh on OS X
+			 * Hack? - Put the programme into sleep.
+			 * No events match ~everyEvent, so nothing
+			 * should be lost in Angband's event queue.
+			 * Even if ticks are 0, it's worth calling for
+			 * the above mentioned reasons.
 			 */
-
-			/* If needed */
-			if (v > 0)
-			{
-				EventRecord tmp;
-				UInt32 ticks;
-
-				/* Convert millisecs to ticks */
-				ticks = (v * 60L) / 1000;
-
-				/*
-				 * Hack? - Put the programme into sleep.
-				 * No events match ~everyEvent, so nothing
-				 * should be lost in Angband's event queue.
-				 * Even if ticks are 0, it's worth calling for
-				 * the above mentioned reasons.
-				 */
-				WaitNextEvent((EventMask)~everyEvent, &tmp, ticks, nil);
-			}
-
-			/* Success */
-			return (0);
+			WaitNextEvent((EventMask)~everyEvent, &tmp, ticks, nil);
 		}
+
+		/* Success */
+		return (0);
+	}
 
 		/* Rename main window */
 	case TERM_XTRA_RENAME_MAIN_WIN:
-		{
-			char *s = strdup(angband_term_name[0]);
+	{
+		char *s = strdup(angband_term_name[0]);
 
-			ctopstr((StringPtr)s);
-			SetWTitle(data[0].w, (StringPtr)s);
+		ctopstr((StringPtr)s);
+		SetWTitle(data[0].w, (StringPtr)s);
 
-			free(s);
-			return (0);
-		}
+		free(s);
+		return (0);
+	}
 
 /* MacOSX == Unix == Good */
 #ifdef USE_MACOSX
 		/* Get Delay of some milliseconds */
 	case TERM_XTRA_GET_DELAY:
-		{
-			int ret;
-			struct timeval tv;
+	{
+		int ret;
+		struct timeval tv;
 
-			ret = gettimeofday(&tv, NULL);
-			Term_xtra_long = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+		ret = gettimeofday(&tv, NULL);
+		Term_xtra_long = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 
-			return ret;
-		}
+		return ret;
+	}
 
 		/* Subdirectory scan */
 	case TERM_XTRA_SCANSUBDIR:
+	{
+		DIR *directory;
+		struct dirent *entry;
+
+		scansubdir_max = 0;
+
+		directory = opendir(scansubdir_dir);
+		if (!directory)
+			return 1;
+
+		while ((entry = readdir(directory)))
 		{
-			DIR *directory;
-			struct dirent *entry;
+			char file[PATH_MAX + NAME_MAX + 2];
+			struct stat filedata;
 
-			scansubdir_max = 0;
-
-			directory = opendir(scansubdir_dir);
-			if (!directory)
-				return 1;
-
-			while ((entry = readdir(directory)))
+			file[PATH_MAX + NAME_MAX] = 0;
+			strncpy(file, scansubdir_dir, PATH_MAX);
+			strncat(file, "/", 2);
+			strncat(file, entry->d_name, NAME_MAX);
+			if (!stat(file, &filedata) && S_ISDIR((filedata.st_mode)))
 			{
-				char file[PATH_MAX + NAME_MAX + 2];
-				struct stat filedata;
-
-				file[PATH_MAX + NAME_MAX] = 0;
-				strncpy(file, scansubdir_dir, PATH_MAX);
-				strncat(file, "/", 2);
-				strncat(file, entry->d_name, NAME_MAX);
-				if (!stat(file, &filedata) && S_ISDIR((filedata.st_mode)))
-				{
-					string_free(scansubdir_result[scansubdir_max]);
-					scansubdir_result[scansubdir_max] = string_make(entry->d_name);
-					++scansubdir_max;
-				}
+				string_free(scansubdir_result[scansubdir_max]);
+				scansubdir_result[scansubdir_max] = string_make(entry->d_name);
+				++scansubdir_max;
 			}
-
-			closedir(directory);
-			return 0;
 		}
+
+		closedir(directory);
+		return 0;
+	}
 #endif
 	}
 
 	/* Oops */
 	return (1);
 }
-
-
 
 /*
  * Low level graphics (Assumes valid input).
@@ -2758,7 +2735,7 @@ static errr Term_curs_mac(int x, int y)
 {
 	Rect r;
 
-	term_data *td = (term_data*)(Term->data);
+	term_data *td = (term_data *)(Term->data);
 
 	/* Set the color */
 	term_data_color(td, TERM_YELLOW);
@@ -2775,8 +2752,8 @@ static errr Term_curs_mac(int x, int y)
 
 	/* Adjust it if double width tiles are requested */
 	if (use_bigtile &&
-	                (x + 1 < Term->wid) &&
-	                (Term->old->a[y][x + 1] == 255))
+		(x + 1 < Term->wid) &&
+		(Term->old->a[y][x + 1] == 255))
 	{
 		r.right += td->tile_wid;
 	}
@@ -2789,7 +2766,6 @@ static errr Term_curs_mac(int x, int y)
 	return (0);
 }
 
-
 /*
  * Low level graphics (Assumes valid input)
  *
@@ -2799,8 +2775,7 @@ static errr Term_wipe_mac(int x, int y, int n)
 {
 	Rect r;
 
-	term_data *td = (term_data*)(Term->data);
-
+	term_data *td = (term_data *)(Term->data);
 
 	/* Erase the block of characters */
 	r.left = x * td->tile_wid + td->size_ow1;
@@ -2812,7 +2787,6 @@ static errr Term_wipe_mac(int x, int y, int n)
 	/* Success */
 	return (0);
 }
-
 
 /*
  * Low level graphics.  Assumes valid input.
@@ -2827,8 +2801,7 @@ static errr Term_text_mac(int x, int y, int n, byte a, const char *cp)
 	Rect r;
 #endif /* CLIP_HACK */
 
-	term_data *td = (term_data*)(Term->data);
-
+	term_data *td = (term_data *)(Term->data);
 
 	/* Set the color */
 	term_data_color(td, a);
@@ -2853,10 +2826,12 @@ static errr Term_text_mac(int x, int y, int n, byte a, const char *cp)
 	MoveTo(xp, yp);
 
 	/* Draw the character */
-	if (n == 1) DrawChar(*cp);
+	if (n == 1)
+		DrawChar(*cp);
 
 	/* Draw the string */
-	else DrawText(cp, 0, n);
+	else
+		DrawText(cp, 0, n);
 
 #ifdef CLIP_HACK
 	/* Obtain current window's rect */
@@ -2870,22 +2845,21 @@ static errr Term_text_mac(int x, int y, int n, byte a, const char *cp)
 	return (0);
 }
 
-
 /*
  * Low level graphics (Assumes valid input)
  *
  * Erase "n" characters starting at (x,y)
  */
 #ifdef USE_TRANSPARENCY
-# ifdef USE_EGO_GRAPHICS
+#ifdef USE_EGO_GRAPHICS
 static errr Term_pict_mac(int x, int y, int n, const byte *ap, const char *cp,
-                          const byte *tap, const char *tcp,
-                          const byte *eap, const char *ecp)
-# else /* USE_EGO_GRAPHICS */
+						  const byte *tap, const char *tcp,
+						  const byte *eap, const char *ecp)
+#else  /* USE_EGO_GRAPHICS */
 static errr Term_pict_mac(int x, int y, int n, const byte *ap, const char *cp,
-                          const byte *tap, const char *tcp)
-# endif  /* USE_EGO_GRAPHICS */
-#else /* USE_TRANSPARENCY */
+						  const byte *tap, const char *tcp)
+#endif /* USE_EGO_GRAPHICS */
+#else  /* USE_TRANSPARENCY */
 static errr Term_pict_mac(int x, int y, int n, const byte *ap, const char *cp)
 #endif /* USE_TRANSPARENCY */
 {
@@ -2898,11 +2872,10 @@ static errr Term_pict_mac(int x, int y, int n, const byte *ap, const char *cp)
 	Rect portRect;
 #endif /* CLIP_HACK */
 
-	term_data *td = (term_data*)(Term->data);
+	term_data *td = (term_data *)(Term->data);
 
 	static RGBColor black = {0x0000, 0x0000, 0x0000};
 	static RGBColor white = {0xFFFF, 0xFFFF, 0xFFFF};
-
 
 #ifdef CLIP_HACK
 	/* Remember current window's rect */
@@ -2928,13 +2901,12 @@ static errr Term_pict_mac(int x, int y, int n, const byte *ap, const char *cp)
 #ifdef USE_TRANSPARENCY
 		byte ta = *tap++;
 		char tc = *tcp++;
-# ifdef USE_EGO_GRAPHICS
+#ifdef USE_EGO_GRAPHICS
 		byte ea = *eap++;
 		char ec = *ecp++;
 		bool has_overlay = (ea && ec);
-# endif  /* USE_EGO_GRAPHICS */
+#endif /* USE_EGO_GRAPHICS */
 #endif
-
 
 #ifdef USE_DOUBLE_TILES
 
@@ -2961,10 +2933,10 @@ static errr Term_pict_mac(int x, int y, int n, const byte *ap, const char *cp)
 #ifdef USE_TRANSPARENCY
 			int t_col, t_row;
 			Rect terrain_r;
-# ifdef USE_EGO_GRAPHICS
+#ifdef USE_EGO_GRAPHICS
 			int e_col, e_row;
 			Rect ego_r;
-# endif  /* USE_EGO_GRAPHICS */
+#endif /* USE_EGO_GRAPHICS */
 #endif /* USE_TRANSPARENCY */
 
 			/* Row and Col */
@@ -2988,7 +2960,7 @@ static errr Term_pict_mac(int x, int y, int n, const byte *ap, const char *cp)
 			terrain_r.right = terrain_r.left + graf_width;
 			terrain_r.bottom = terrain_r.top + graf_height;
 
-# ifdef USE_EGO_GRAPHICS
+#ifdef USE_EGO_GRAPHICS
 
 			/* If there's an overlay */
 			if (has_overlay)
@@ -3004,7 +2976,7 @@ static errr Term_pict_mac(int x, int y, int n, const byte *ap, const char *cp)
 				ego_r.bottom = ego_r.top + graf_height;
 			}
 
-# endif  /* USE_EGO_GRAPHICS */
+#endif /* USE_EGO_GRAPHICS */
 
 #endif /* USE_TRANSPARENCY */
 
@@ -3015,7 +2987,8 @@ static errr Term_pict_mac(int x, int y, int n, const byte *ap, const char *cp)
 #ifdef USE_DOUBLE_TILES
 
 			/* Double width tiles */
-			if (use_bigtile) dst_r.right += td->tile_wid;
+			if (use_bigtile)
+				dst_r.right += td->tile_wid;
 
 #endif /* USE_DOUBLE_TILES */
 
@@ -3043,54 +3016,54 @@ static errr Term_pict_mac(int x, int y, int n, const byte *ap, const char *cp)
 				/* No transparency effects */
 			case TR_NONE:
 			default:
-				{
-					/* Draw the picture */
-					CopyBits((BitMap*)frameP->framePix,
-					         (BitMap*)*pixmap_h,
-					         &src_r, &dst_r, srcCopy, NULL);
+			{
+				/* Draw the picture */
+				CopyBits((BitMap *)frameP->framePix,
+						 (BitMap *)*pixmap_h,
+						 &src_r, &dst_r, srcCopy, NULL);
 
-					break;
-				}
+				break;
+			}
 
 				/* Overwriting with transparent black pixels */
 			case TR_OVER:
+			{
+				/* Draw the terrain */
+				CopyBits((BitMap *)frameP->framePix,
+						 (BitMap *)*pixmap_h,
+						 &terrain_r, &dst_r, srcCopy, NULL);
+
+				/* Make black pixels transparent */
+				RGBBackColor(&black);
+
+				/* Draw mon/obj if there's one */
+				if ((row != t_row) || (col != t_col))
+					CopyBits((BitMap *)frameP->framePix,
+							 (BitMap *)*pixmap_h,
+							 &src_r, &dst_r, transparent, NULL);
+
+#ifdef USE_EGO_GRAPHICS
+
+				/* Draw overlay if there's one */
+				if (has_overlay)
 				{
-					/* Draw the terrain */
-					CopyBits((BitMap*)frameP->framePix,
-					         (BitMap*)*pixmap_h,
-					         &terrain_r, &dst_r, srcCopy, NULL);
-
-					/* Make black pixels transparent */
-					RGBBackColor(&black);
-
-					/* Draw mon/obj if there's one */
-					if ((row != t_row) || (col != t_col))
-						CopyBits((BitMap*)frameP->framePix,
-						         (BitMap*)*pixmap_h,
-						         &src_r, &dst_r, transparent, NULL);
-
-# ifdef USE_EGO_GRAPHICS
-
-					/* Draw overlay if there's one */
-					if (has_overlay)
-					{
-						CopyBits((BitMap*)frameP->framePix,
-						         (BitMap*)*pixmap_h,
-						         &ego_r, &dst_r, transparent, NULL);
-					}
-
-# endif  /* USE_EGO_GRAPHICS */
-
-					break;
+					CopyBits((BitMap *)frameP->framePix,
+							 (BitMap *)*pixmap_h,
+							 &ego_r, &dst_r, transparent, NULL);
 				}
+
+#endif /* USE_EGO_GRAPHICS */
+
+				break;
+			}
 			}
 
 #else /* USE_TRANSPARENCY */
 
 			/* Draw the picture */
-			CopyBits((BitMap*)frameP->framePix,
-			         (BitMap*)*pixmap_h,
-			         &src_r, &dst_r, srcCopy, NULL);
+			CopyBits((BitMap *)frameP->framePix,
+					 (BitMap *)*pixmap_h,
+					 &src_r, &dst_r, srcCopy, NULL);
 
 #endif /* USE_TRANSPARENCY */
 
@@ -3152,10 +3125,6 @@ static errr Term_pict_mac(int x, int y, int n, const byte *ap, const char *cp)
 	return (0);
 }
 
-
-
-
-
 /*
  * Create and initialize window number "i"
  */
@@ -3166,10 +3135,12 @@ static void term_data_link(int i)
 	term_data *td = &data[i];
 
 	/* Only once */
-	if (td->t) return;
+	if (td->t)
+		return;
 
 	/* Require mapped */
-	if (!td->mapped) return;
+	if (!td->mapped)
+		return;
 
 	/* Allocate */
 	MAKE(td->t, term);
@@ -3216,9 +3187,6 @@ static void term_data_link(int i)
 	Term_activate(old);
 }
 
-
-
-
 #ifdef MACH_O_CARBON
 
 /*
@@ -3241,13 +3209,15 @@ static char *locate_lib(char *buf, size_t size)
 	main_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 
 	/* Oops */
-	if (main_url == NULL) goto ret;
+	if (main_url == NULL)
+		goto ret;
 
 	/* Convert it to POSIX pathname */
 	main_str = CFURLCopyFileSystemPath(main_url, kCFURLPOSIXPathStyle);
 
 	/* Oops */
-	if (main_str == NULL) goto ret;
+	if (main_str == NULL)
+		goto ret;
 
 	/* Convert it again from darn unisomething encoding to ASCII */
 	if (CFStringGetCString(main_str, buf, size, kTextEncodingUS_ASCII) == FALSE)
@@ -3256,7 +3226,8 @@ static char *locate_lib(char *buf, size_t size)
 	/*
 	 * Paranoia - bounds check
 	 */
-	if (strlen(buf) + 25 + 1 > size) goto ret;
+	if (strlen(buf) + 25 + 1 > size)
+		goto ret;
 
 	/* Location of the data */
 	strcat(buf, "/Contents/Resources/");
@@ -3267,28 +3238,29 @@ static char *locate_lib(char *buf, size_t size)
 ret:
 
 	/* Release objects allocated and implicitly retained by the program */
-	if (main_str) CFRelease(main_str);
-	if (main_url) CFRelease(main_url);
+	if (main_str)
+		CFRelease(main_str);
+	if (main_url)
+		CFRelease(main_url);
 
 	/* pathname of the lib folder or NULL */
 	return (res);
 }
 
-
 #else /* MACH_O_CARBON */
 
 /*
-* Set the "current working directory" (also known as the "default"
-* volume/directory) to the location of the current application.
-*
-* Original code by: Maarten Hazewinkel (mmhazewi@cs.ruu.nl)
-*
-* Completely rewritten to use Carbon Process Manager.  It retrieves the
-* volume and direcotry of the current application and simply stores it
-* in the (static) global variables app_vol and app_dir, but doesn't
-* mess with the "current working directory", because it has long been
-* an obsolete (and arcane!) feature.
-*/
+ * Set the "current working directory" (also known as the "default"
+ * volume/directory) to the location of the current application.
+ *
+ * Original code by: Maarten Hazewinkel (mmhazewi@cs.ruu.nl)
+ *
+ * Completely rewritten to use Carbon Process Manager.  It retrieves the
+ * volume and direcotry of the current application and simply stores it
+ * in the (static) global variables app_vol and app_dir, but doesn't
+ * mess with the "current working directory", because it has long been
+ * an obsolete (and arcane!) feature.
+ */
 static void SetupAppDir(void)
 {
 	OSErr err;
@@ -3324,9 +3296,6 @@ static void SetupAppDir(void)
 
 #endif /* MACH_O_CARBON */
 
-
-
-
 /*
  * Using Core Foundation's Preferences services -- pelpel
  *
@@ -3340,7 +3309,6 @@ static void SetupAppDir(void)
  * far from my liking, but since this is only called at the
  * beginning and the end of a session, I hope this hardly matters.
  */
-
 
 /*
  * Store "value" as the value for preferences item name
@@ -3361,19 +3329,20 @@ static void save_pref_short(const char *key, short value)
 	{
 		/* Store the key-value pair in the applications preferences */
 		CFPreferencesSetAppValue(
-		        cf_key,
-		        cf_value,
-		        kCFPreferencesCurrentApplication);
+			cf_key,
+			cf_value,
+			kCFPreferencesCurrentApplication);
 	}
 
 	/*
 	 * Free CF data - the reverse order is a vain attempt to
 	 * minimise memory fragmentation.
 	 */
-	if (cf_value) CFRelease(cf_value);
-	if (cf_key) CFRelease(cf_key);
+	if (cf_value)
+		CFRelease(cf_value);
+	if (cf_key)
+		CFRelease(cf_key);
 }
-
 
 /*
  * Load preference value for key, returns TRUE if it succeeds with
@@ -3388,12 +3357,13 @@ static bool query_load_pref_short(const char *key, short *vptr)
 	cf_key = CFStringCreateWithCString(NULL, key, kTextEncodingUS_ASCII);
 
 	/* Oops */
-	if (cf_key == NULL) return (FALSE);
+	if (cf_key == NULL)
+		return (FALSE);
 
 	/* Retrieve value for the key */
 	cf_value = CFPreferencesCopyAppValue(
-	                   cf_key,
-	                   kCFPreferencesCurrentApplication);
+		cf_key,
+		kCFPreferencesCurrentApplication);
 
 	/* Value not found */
 	if (cf_value == NULL)
@@ -3404,9 +3374,9 @@ static bool query_load_pref_short(const char *key, short *vptr)
 
 	/* Convert the value to short */
 	CFNumberGetValue(
-	        cf_value,
-	        kCFNumberShortType,
-	        vptr);
+		cf_value,
+		kCFNumberShortType,
+		vptr);
 
 	/* Free CF data */
 	CFRelease(cf_value);
@@ -3416,7 +3386,6 @@ static bool query_load_pref_short(const char *key, short *vptr)
 	return (TRUE);
 }
 
-
 /*
  * Update short data pointed by vptr only if preferences
  * value for key is located.
@@ -3425,10 +3394,10 @@ static void load_pref_short(const char *key, short *vptr)
 {
 	short tmp;
 
-	if (query_load_pref_short(key, &tmp)) *vptr = tmp;
+	if (query_load_pref_short(key, &tmp))
+		*vptr = tmp;
 	return;
 }
-
 
 /*
  * Save preferences to preferences file for current host+current user+
@@ -3456,7 +3425,7 @@ static void cf_save_prefs()
 	{
 		term_data *td = &data[i];
 
-		save_pref_short(format("term%d.font_mono", i), td->font_mono); 
+		save_pref_short(format("term%d.font_mono", i), td->font_mono);
 		save_pref_short(format("term%d.font_o_x", i), td->font_o_x);
 		save_pref_short(format("term%d.font_o_y", i), td->font_o_y);
 		save_pref_short(format("term%d.font_wid", i), td->font_wid);
@@ -3489,9 +3458,8 @@ static void cf_save_prefs()
 	 * Make sure preferences are persistent
 	 */
 	CFPreferencesAppSynchronize(
-	        kCFPreferencesCurrentApplication);
+		kCFPreferencesCurrentApplication);
 }
-
 
 /*
  * Load preferences from preferences file for current host+current user+
@@ -3562,7 +3530,6 @@ static void cf_load_prefs()
 		}
 
 #endif /* USE_DOUBLE_TILES */
-
 	}
 
 	/* Windows */
@@ -3584,7 +3551,7 @@ static void cf_load_prefs()
 		load_pref_short(format("term%d.left", i), &td->r.left);
 		load_pref_short(format("term%d.top", i), &td->r.top);
 
-		load_pref_short(format("term%d.font_mono", i), &td->font_mono); 
+		load_pref_short(format("term%d.font_mono", i), &td->font_mono);
 		load_pref_short(format("term%d.font_o_x", i), &td->font_o_x);
 		load_pref_short(format("term%d.font_o_y", i), &td->font_o_y);
 		load_pref_short(format("term%d.font_wid", i), &td->font_wid);
@@ -3599,9 +3566,6 @@ static void cf_load_prefs()
 		load_pref_short(format("term%d.oh2", i), &td->size_oh2);
 	}
 }
-
-
-
 
 /*
  * Hack -- default data for a window
@@ -3649,7 +3613,6 @@ static void term_data_hack(term_data *td)
 	td->keys = 16;
 }
 
-
 /*
  * Read the preference file, Create the windows.
  *
@@ -3661,11 +3624,10 @@ static void init_windows(void)
 
 	term_data *td;
 
-
 	/*** Default values ***/
 
 	/* Initialize (backwards) */
-	for (i = MAX_TERM_DATA; i-- > 0; )
+	for (i = MAX_TERM_DATA; i-- > 0;)
 	{
 		int n;
 
@@ -3684,10 +3646,11 @@ static void init_windows(void)
 		n = strlen(s);
 
 		/* Maximal length */
-		if (n > 15) n = 15;
+		if (n > 15)
+			n = 15;
 
 		/* Copy the title */
-		strncpy((char*)(td->title) + 1, s, n);
+		strncpy((char *)(td->title) + 1, s, n);
 
 		/* Save the length */
 		td->title[0] = n;
@@ -3700,11 +3663,9 @@ static void init_windows(void)
 		b++;
 	}
 
-
 	/*** Load preferences ***/
 
 	cf_load_prefs();
-
 
 	/*** Instantiate ***/
 
@@ -3718,7 +3679,7 @@ static void init_windows(void)
 	td->mapped = TRUE;
 
 	/* Link (backwards, for stacking order) */
-	for (i = MAX_TERM_DATA; i-- > 0; )
+	for (i = MAX_TERM_DATA; i-- > 0;)
 	{
 		term_data_link(i);
 	}
@@ -3730,7 +3691,6 @@ static void init_windows(void)
 	Term_activate(td->t);
 }
 
-
 /*
  * Save preferences
  */
@@ -3738,9 +3698,6 @@ static void save_pref_file(void)
 {
 	cf_save_prefs();
 }
-
-
-
 
 #ifndef SAVEFILE_SCREEN
 
@@ -3772,15 +3729,16 @@ static bool select_savefile(bool all)
 
 	/* Find :lib:save: folder */
 	err = FSMakeFSSpec(
-	              app_vol,
-	              app_dir,
-	              "\p:lib:save:",
-	              &theFolderSpec);
+		app_vol,
+		app_dir,
+		"\p:lib:save:",
+		&theFolderSpec);
 
 #endif
 
 	/* Oops */
-	if (err != noErr) quit("Unable to find the folder :lib:save:");
+	if (err != noErr)
+		quit("Unable to find the folder :lib:save:");
 
 	/* Get default Navigator dialog options */
 	err = NavGetDefaultDialogOptions(&dialogOptions);
@@ -3793,13 +3751,14 @@ static bool select_savefile(bool all)
 
 	/* Make descriptor for default location */
 	err = AECreateDesc(
-	              typeFSS,
-	              &theFolderSpec,
-	              sizeof(FSSpec),
-	              &defaultLocation);
+		typeFSS,
+		&theFolderSpec,
+		sizeof(FSSpec),
+		&defaultLocation);
 
 	/* Oops */
-	if (err != noErr) quit("Unable to allocate descriptor");
+	if (err != noErr)
+		quit("Unable to allocate descriptor");
 
 	/* We are indifferent to signature and file types */
 	if (all)
@@ -3810,29 +3769,30 @@ static bool select_savefile(bool all)
 	/* Set up type handle */
 	else
 	{
-		err = PtrToHand(&types, (Handle *) & myTypeList, sizeof(NavTypeList));
+		err = PtrToHand(&types, (Handle *)&myTypeList, sizeof(NavTypeList));
 
 		/* Oops */
-		if (err != noErr) quit("Error in PtrToHand. Try enlarging heap");
-
+		if (err != noErr)
+			quit("Error in PtrToHand. Try enlarging heap");
 	}
 
 	/* Call NavGetFile() with the types list */
 	err = NavChooseFile(
-	              &defaultLocation,
-	              &reply,
-	              &dialogOptions,
-	              nil,
-	              nil,
-	              nil,
-	              myTypeList,
-	              nil);
+		&defaultLocation,
+		&reply,
+		&dialogOptions,
+		nil,
+		nil,
+		nil,
+		myTypeList,
+		nil);
 
 	/* Free type list */
 	DisposeHandle((Handle)myTypeList);
 
 	/* Invalid response -- allow the user to cancel */
-	if (!reply.validRecord) return (FALSE);
+	if (!reply.validRecord)
+		return (FALSE);
 
 	/* Retrieve FSSpec from the reply */
 	if (err == noErr)
@@ -3843,14 +3803,14 @@ static bool select_savefile(bool all)
 
 		/* Get a pointer to selected file */
 		(void)AEGetNthPtr(
-		        &reply.selection,
-		        1,
-		        typeFSS,
-		        &theKeyword,
-		        &actualType,
-		        &savedGameSpec,
-		        sizeof(FSSpec),
-		        &actualSize);
+			&reply.selection,
+			1,
+			typeFSS,
+			&theKeyword,
+			&actualType,
+			&savedGameSpec,
+			sizeof(FSSpec),
+			&actualSize);
 
 		/* Dispose NavReplyRecord, resources and descriptors */
 		(void)NavDisposeReply(&reply);
@@ -3868,17 +3828,16 @@ static bool select_savefile(bool all)
 
 	/* Convert FSSpec to pathname and store it in variable savefile */
 	refnum_to_name(
-	        savefile,
-	        savedGameSpec.parID,
-	        savedGameSpec.vRefNum,
-	        (char *)savedGameSpec.name);
+		savefile,
+		savedGameSpec.parID,
+		savedGameSpec.vRefNum,
+		(char *)savedGameSpec.name);
 
 #endif
 
 	/* Success */
 	return (TRUE);
 }
-
 
 /*
  * Handle menu: "File" + "New"
@@ -3901,14 +3860,14 @@ static void do_menu_file_new(void)
 	quit(NULL);
 }
 
-
 /*
  * Handle menu: "File" + "Open" /  "Import"
  */
 static void do_menu_file_open(bool all)
 {
 	/* Let the player to choose savefile */
-	if (!select_savefile(all)) return;
+	if (!select_savefile(all))
+		return;
 
 	/* Hack */
 	HiliteMenu(0);
@@ -3927,7 +3886,6 @@ static void do_menu_file_open(bool all)
 }
 
 #endif /* !SAVEFILE_SCREEN */
-
 
 /*
  * Handle the "open_when_ready" flag
@@ -3964,9 +3922,6 @@ static void handle_open_when_ready(void)
 	}
 }
 
-
-
-
 /*
  * Menus
  *
@@ -3986,70 +3941,69 @@ static void handle_open_when_ready(void)
  */
 
 /* Apple menu */
-#define MENU_APPLE	128
-#define ITEM_ABOUT	1
+#define MENU_APPLE 128
+#define ITEM_ABOUT 1
 
 /* File menu */
-#define MENU_FILE	129
+#define MENU_FILE 129
 #ifndef SAVEFILE_SCREEN
-# define ITEM_NEW	1
-# define ITEM_OPEN	2
-# define ITEM_IMPORT	3
-# define ITEM_CLOSE	4
-# define ITEM_SAVE	5
-# ifdef HAS_SCORE_MENU
-# define ITEM_SCORE 7
-# define ITEM_QUIT	8
-# else
-# define ITEM_QUIT	7
-# endif  /* HAS_SCORE_MENU */
-#else /* !SAVEFILE_SCREEN - in-game savefile menu */
-# define ITEM_CLOSE	1
-# define ITEM_SAVE	2
-# ifdef HAS_SCORE_MENU
-# define ITEM_SCORE 4
-# define ITEM_QUIT	5
-# else
-# define ITEM_QUIT	4
-# endif  /* HAS_SCORE_MENU */
+#define ITEM_NEW 1
+#define ITEM_OPEN 2
+#define ITEM_IMPORT 3
+#define ITEM_CLOSE 4
+#define ITEM_SAVE 5
+#ifdef HAS_SCORE_MENU
+#define ITEM_SCORE 7
+#define ITEM_QUIT 8
+#else
+#define ITEM_QUIT 7
+#endif /* HAS_SCORE_MENU */
+#else  /* !SAVEFILE_SCREEN - in-game savefile menu */
+#define ITEM_CLOSE 1
+#define ITEM_SAVE 2
+#ifdef HAS_SCORE_MENU
+#define ITEM_SCORE 4
+#define ITEM_QUIT 5
+#else
+#define ITEM_QUIT 4
+#endif /* HAS_SCORE_MENU */
 #endif /* !SAVEFILE_SCREEN */
 
 /* Edit menu */
-#define MENU_EDIT	130
-#define ITEM_UNDO	1
-#define ITEM_CUT	3
-#define ITEM_COPY	4
-#define ITEM_PASTE	5
-#define ITEM_CLEAR	6
+#define MENU_EDIT 130
+#define ITEM_UNDO 1
+#define ITEM_CUT 3
+#define ITEM_COPY 4
+#define ITEM_PASTE 5
+#define ITEM_CLEAR 6
 
 /* Font menu */
-#define MENU_FONT	131
-#define ITEM_BOLD	1
-#define ITEM_WIDE	2
+#define MENU_FONT 131
+#define ITEM_BOLD 1
+#define ITEM_WIDE 2
 
 /* Size menu */
-#define MENU_SIZE	132
+#define MENU_SIZE 132
 
 /* Windows menu */
-#define MENU_WINDOWS	133
+#define MENU_WINDOWS 133
 
 /* Special menu */
-#define MENU_SPECIAL	134
-#define ITEM_SOUND	1
-#define ITEM_GRAPH	2
-# define SUBMENU_GRAPH	144
-# define ITEM_NONE	1
-# define ITEM_8X8	2
-# define ITEM_16X16	3
-# define ITEM_32X32	4
-# define ITEM_BIGTILE 6
+#define MENU_SPECIAL 134
+#define ITEM_SOUND 1
+#define ITEM_GRAPH 2
+#define SUBMENU_GRAPH 144
+#define ITEM_NONE 1
+#define ITEM_8X8 2
+#define ITEM_16X16 3
+#define ITEM_32X32 4
+#define ITEM_BIGTILE 6
 #define ITEM_TILEWIDTH 3
-# define SUBMENU_TILEWIDTH 145
+#define SUBMENU_TILEWIDTH 145
 #define ITEM_TILEHEIGHT 4
-# define SUBMENU_TILEHEIGHT 146
-#define ITEM_FIDDLE	6
-#define ITEM_WIZARD	7
-
+#define SUBMENU_TILEHEIGHT 146
+#define ITEM_FIDDLE 6
+#define ITEM_WIZARD 7
 
 /*
  * I HATE UNICODE!  We've never wanted it.  Some multi-national companies
@@ -4089,13 +4043,15 @@ static void init_menubar(void)
 		err = CreateNibReference(CFSTR("main"), &nib);
 
 		/* Fatal error - missing Main.nib */
-		if (err != noErr) quit("Cannot find Main.nib in the bundle!");
+		if (err != noErr)
+			quit("Cannot find Main.nib in the bundle!");
 
 		/* Unarchive the menu bar and make it ready to use */
 		err = SetMenuBarFromNib(nib, CFSTR("MainMenu"));
 
 		/* Fatal error - couldn't insert menu bar */
-		if (err != noErr) quit("Cannot prepare menu bar!");
+		if (err != noErr)
+			quit("Cannot prepare menu bar!");
 
 		/* Dispose of the nib reference because we don't need it any longer */
 		DisposeNibReference(nib);
@@ -4111,7 +4067,8 @@ static void init_menubar(void)
 		mbar = GetNewMBar(128);
 
 		/* Whoops! */
-		if (mbar == nil) quit("Cannot find menubar('MBAR') id 128!");
+		if (mbar == nil)
+			quit("Cannot find menubar('MBAR') id 128!");
 
 		/* Insert them into the current menu list */
 		SetMenuBar(mbar);
@@ -4121,7 +4078,6 @@ static void init_menubar(void)
 	}
 
 #endif /* USE_NIB */
-
 
 	/* Apple menu (id 128) - we don't have to do anything */
 
@@ -4146,9 +4102,7 @@ static void init_menubar(void)
 
 #endif /* !USE_NIB */
 
-
 	/* Edit menu (id 130) - we don't have to do anything */
-
 
 	/*
 	 * Font menu (id 131) - append names of mono-spaced fonts
@@ -4161,10 +4115,10 @@ static void init_menubar(void)
 
 	/* Make the fake window so that we can retrieve font info */
 	(void)CreateNewWindow(
-	        kDocumentWindowClass,
-	        kWindowNoAttributes,
-	        &r,
-	        &tmpw);
+		kDocumentWindowClass,
+		kWindowNoAttributes,
+		&r,
+		&tmpw);
 
 	/* Activate the "fake" window */
 	SetPort(GetWindowPort(tmpw));
@@ -4213,7 +4167,6 @@ static void init_menubar(void)
 	/* Add the fonts to the menu */
 	AppendResMenu(m, 'FONT');
 
-
 #ifndef USE_NIB
 
 	/* Size menu (id 132) */
@@ -4225,8 +4178,8 @@ static void init_menubar(void)
 		Str15 buf;
 
 		/* Textual size */
-		strnfmt((char*)buf + 1, 15, "%d", i);
-		buf[0] = strlen((char*)buf + 1);
+		strnfmt((char *)buf + 1, 15, "%d", i);
+		buf[0] = strlen((char *)buf + 1);
 
 		/* Add the item */
 		AppendMenu(m, buf);
@@ -4237,7 +4190,6 @@ static void init_menubar(void)
 
 #endif /* !USE_NIB */
 
-
 	/* Windows menu (id 133) */
 	m = GetMenuHandle(MENU_WINDOWS);
 
@@ -4247,16 +4199,16 @@ static void init_menubar(void)
 		Str15 buf;
 
 		/* Describe the item */
-		strnfmt((char*)buf + 1, 15, "%.15s", angband_term_name[i]);
-		buf[0] = strlen((char*)buf + 1);
+		strnfmt((char *)buf + 1, 15, "%.15s", angband_term_name[i]);
+		buf[0] = strlen((char *)buf + 1);
 
 		/* Add the item */
 		AppendMenu(m, buf);
 
 		/* Command-Key shortcuts */
-		if (i < 8) SetItemCmd(m, i + 1, I2D(i));
+		if (i < 8)
+			SetItemCmd(m, i + 1, I2D(i));
 	}
-
 
 #ifndef USE_NIB
 
@@ -4287,8 +4239,8 @@ static void init_menubar(void)
 			Str15 buf;
 
 			/* Textual size */
-			strnfmt((char*)buf + 1, 15, "%d", i);
-			buf[0] = strlen((char*)buf + 1);
+			strnfmt((char *)buf + 1, 15, "%d", i);
+			buf[0] = strlen((char *)buf + 1);
 
 			/* Append item */
 			AppendMenu(submenu, buf);
@@ -4308,15 +4260,14 @@ static void init_menubar(void)
 		/* Get the submenu */
 		submenu = GetMenu(SUBMENU_TILEHEIGHT);
 
-
 		/* Add some sizes */
 		for (i = 4, n = 1; i <= 32; i++, n++)
 		{
 			Str15 buf;
 
 			/* Textual size */
-			strnfmt((char*)buf + 1, 15, "%d", i);
-			buf[0] = strlen((char*)buf + 1);
+			strnfmt((char *)buf + 1, 15, "%d", i);
+			buf[0] = strlen((char *)buf + 1);
 
 			/* Append item */
 			AppendMenu(submenu, buf);
@@ -4334,7 +4285,6 @@ static void init_menubar(void)
 	/* Update the menu bar */
 	DrawMenuBar();
 }
-
 
 /*
  * Prepare the menus
@@ -4356,17 +4306,17 @@ static void setup_menus(void)
 
 	term_data *td = NULL;
 
-
 	/* Relevant "term_data" */
 	for (i = 0; i < MAX_TERM_DATA; i++)
 	{
 		/* Unused */
-		if (!data[i].t) continue;
+		if (!data[i].t)
+			continue;
 
 		/* Notice the matching window */
-		if (data[i].w == FrontWindow()) td = &data[i];
+		if (data[i].w == FrontWindow())
+			td = &data[i];
 	}
-
 
 	/* File menu */
 	m = GetMenuHandle(MENU_FILE);
@@ -4425,7 +4375,6 @@ static void setup_menus(void)
 		}
 	}
 
-
 	/* Edit menu */
 	m = GetMenuHandle(MENU_EDIT);
 
@@ -4449,7 +4398,6 @@ static void setup_menus(void)
 		EnableMenuItem(m, ITEM_PASTE);
 		EnableMenuItem(m, ITEM_CLEAR);
 	}
-
 
 	/* Font menu */
 	m = GetMenuHandle(MENU_FONT);
@@ -4481,10 +4429,12 @@ static void setup_menus(void)
 		EnableMenuItem(m, ITEM_WIDE);
 
 		/* Check the appropriate "bold-ness" */
-		if (td->font_face & bold) CheckMenuItem(m, ITEM_BOLD, TRUE);
+		if (td->font_face & bold)
+			CheckMenuItem(m, ITEM_BOLD, TRUE);
 
 		/* Check the appropriate "wide-ness" */
-		if (td->font_face & extend) CheckMenuItem(m, ITEM_WIDE, TRUE);
+		if (td->font_face & extend)
+			CheckMenuItem(m, ITEM_WIDE, TRUE);
 
 		/* Analyze fonts */
 		for (i = 4; i <= n; i++)
@@ -4497,10 +4447,10 @@ static void setup_menus(void)
 			GetFNum(s, &value);
 
 			/* Check active font */
-			if (td->font_id == value) CheckMenuItem(m, i, TRUE);
+			if (td->font_id == value)
+				CheckMenuItem(m, i, TRUE);
 		}
 	}
-
 
 	/* Size menu */
 	m = GetMenuHandle(MENU_SIZE);
@@ -4526,13 +4476,14 @@ static void setup_menus(void)
 			value = menu_size_values[i];
 
 			/* Enable the "real" sizes */
-			if (RealFont(td->font_id, value)) EnableMenuItem(m, i);
+			if (RealFont(td->font_id, value))
+				EnableMenuItem(m, i);
 
 			/* Check the current size */
-			if (td->font_size == value) CheckMenuItem(m, i, TRUE);
+			if (td->font_size == value)
+				CheckMenuItem(m, i, TRUE);
 		}
 	}
-
 
 	/* Windows menu */
 	m = GetMenuHandle(MENU_WINDOWS);
@@ -4546,7 +4497,6 @@ static void setup_menus(void)
 		/* Check if needed */
 		CheckMenuItem(m, i, data[i - 1].mapped);
 	}
-
 
 	/* Special menu */
 	m = GetMenuHandle(MENU_SPECIAL);
@@ -4604,11 +4554,11 @@ static void setup_menus(void)
 #ifdef USE_DOUBLE_TILES
 
 		/* Item "Big tiles" */
-		if (inkey_flag) EnableMenuItem(submenu, ITEM_BIGTILE);
+		if (inkey_flag)
+			EnableMenuItem(submenu, ITEM_BIGTILE);
 		CheckMenuItem(submenu, ITEM_BIGTILE, use_bigtile);
 
 #endif /* USE_DOUBLE_TILES */
-
 	}
 
 	/* Item "TileWidth" */
@@ -4640,10 +4590,12 @@ static void setup_menus(void)
 				value = menu_tilewidth_values[i];
 
 				/* Enable */
-				if (value >= td->font_wid) EnableMenuItem(submenu, i);
+				if (value >= td->font_wid)
+					EnableMenuItem(submenu, i);
 
 				/* Check the current size */
-				if (td->tile_wid == value) CheckMenuItem(submenu, i, TRUE);
+				if (td->tile_wid == value)
+					CheckMenuItem(submenu, i, TRUE);
 			}
 		}
 	}
@@ -4677,10 +4629,12 @@ static void setup_menus(void)
 				value = menu_tileheight_values[i];
 
 				/* Enable */
-				if (value >= td->font_hgt) EnableMenuItem(submenu, i);
+				if (value >= td->font_hgt)
+					EnableMenuItem(submenu, i);
 
 				/* Check the current size */
-				if (td->tile_hgt == value) CheckMenuItem(submenu, i, TRUE);
+				if (td->tile_hgt == value)
+					CheckMenuItem(submenu, i, TRUE);
 			}
 		}
 	}
@@ -4692,7 +4646,6 @@ static void setup_menus(void)
 	/* Item "arg_wizard" */
 	EnableMenuItem(m, ITEM_WIZARD);
 	CheckMenuItem(m, ITEM_WIZARD, arg_wizard);
-
 
 	/* TileHeight menu */
 	m = GetMenuHandle(SUBMENU_TILEHEIGHT);
@@ -4708,7 +4661,6 @@ static void setup_menus(void)
 		CheckMenuItem(m, i, FALSE);
 	}
 }
-
 
 /*
  * Process a menu selection (see above)
@@ -4730,174 +4682,174 @@ static void menu(long mc)
 
 	WindowPtr old_win;
 
-
 	/* Analyze the menu command */
 	menuid = HiWord(mc);
 	selection = LoWord(mc);
-
 
 	/* Find the window */
 	for (i = 0; i < MAX_TERM_DATA; i++)
 	{
 		/* Skip dead windows */
-		if (!data[i].t) continue;
+		if (!data[i].t)
+			continue;
 
 		/* Notice matches */
-		if (data[i].w == FrontWindow()) td = &data[i];
+		if (data[i].w == FrontWindow())
+			td = &data[i];
 	}
-
 
 	/* Branch on the menu */
 	switch (menuid)
 	{
 		/* Apple Menu */
 	case MENU_APPLE:
+	{
+		/* About Angband... */
+		if (selection == ITEM_ABOUT)
 		{
-			/* About Angband... */
-			if (selection == ITEM_ABOUT)
-			{
-				DialogPtr dialog;
-				short item_hit;
+			DialogPtr dialog;
+			short item_hit;
 
-				/* Get the about dialogue */
-				dialog = GetNewDialog(128, 0, (WindowPtr) - 1);
+			/* Get the about dialogue */
+			dialog = GetNewDialog(128, 0, (WindowPtr)-1);
 
-				/* Move it to the middle of the screen */
-				RepositionWindow(
-				        GetDialogWindow(dialog),
-				        NULL,
-				        kWindowCenterOnMainScreen);
+			/* Move it to the middle of the screen */
+			RepositionWindow(
+				GetDialogWindow(dialog),
+				NULL,
+				kWindowCenterOnMainScreen);
 
-				/* Show the dialog */
-				TransitionWindow(GetDialogWindow(dialog),
-				                 kWindowZoomTransitionEffect,
-				                 kWindowShowTransitionAction,
-				                 NULL);
+			/* Show the dialog */
+			TransitionWindow(GetDialogWindow(dialog),
+							 kWindowZoomTransitionEffect,
+							 kWindowShowTransitionAction,
+							 NULL);
 
-				/* Wait for user to click on it */
-				ModalDialog(0, &item_hit);
+			/* Wait for user to click on it */
+			ModalDialog(0, &item_hit);
 
-				/* Free the dialogue */
-				DisposeDialog(dialog);
+			/* Free the dialogue */
+			DisposeDialog(dialog);
+			break;
+		}
+
+		break;
+	}
+
+		/* File Menu */
+	case MENU_FILE:
+	{
+		switch (selection)
+		{
+#ifndef SAVEFILE_SCREEN
+
+			/* New */
+		case ITEM_NEW:
+		{
+			do_menu_file_new();
+			break;
+		}
+
+			/* Open... */
+		case ITEM_OPEN:
+		{
+			do_menu_file_open(FALSE);
+			break;
+		}
+
+			/* Import... */
+		case ITEM_IMPORT:
+		{
+			do_menu_file_open(TRUE);
+			break;
+		}
+
+#endif /* !SAVEFILE_SCREEN */
+
+			/* Close */
+		case ITEM_CLOSE:
+		{
+			/* No window */
+			if (!td)
 				break;
-			}
+
+			/* Not Mapped */
+			td->mapped = FALSE;
+
+			/* Not Mapped */
+			td->t->mapped_flag = FALSE;
+
+			/* Hide the window */
+			TransitionWindow(td->w,
+							 kWindowZoomTransitionEffect,
+							 kWindowHideTransitionAction,
+							 NULL);
 
 			break;
 		}
 
-		/* File Menu */
-	case MENU_FILE:
+			/* Save */
+		case ITEM_SAVE:
 		{
-			switch (selection)
-			{
-#ifndef SAVEFILE_SCREEN
+			/* Hack -- Forget messages */
+			msg_flag = FALSE;
 
-				/* New */
-			case ITEM_NEW:
-				{
-					do_menu_file_new();
-					break;
-				}
-
-				/* Open... */
-			case ITEM_OPEN:
-				{
-					do_menu_file_open(FALSE);
-					break;
-				}
-
-				/* Import... */
-			case ITEM_IMPORT:
-				{
-					do_menu_file_open(TRUE);
-					break;
-				}
-
-#endif /* !SAVEFILE_SCREEN */
-
-				/* Close */
-			case ITEM_CLOSE:
-				{
-					/* No window */
-					if (!td) break;
-
-					/* Not Mapped */
-					td->mapped = FALSE;
-
-					/* Not Mapped */
-					td->t->mapped_flag = FALSE;
-
-					/* Hide the window */
-					TransitionWindow(td->w,
-					                 kWindowZoomTransitionEffect,
-					                 kWindowHideTransitionAction,
-					                 NULL);
-
-					break;
-				}
-
-				/* Save */
-			case ITEM_SAVE:
-				{
-					/* Hack -- Forget messages */
-					msg_flag = FALSE;
-
-					/* Hack -- Save the game */
+			/* Hack -- Save the game */
 #ifndef ZANG_AUTO_SAVE
-					do_cmd_save_game();
+			do_cmd_save_game();
 #else
-					do_cmd_save_game(FALSE);
+			do_cmd_save_game(FALSE);
 #endif /* !ZANG_AUTO_SAVE */
 
-					break;
-				}
+			break;
+		}
 
 #ifdef HAS_SCORE_MENU
 
-				/* Show score */
-			case ITEM_SCORE:
-				{
-					char buf[1024];
+			/* Show score */
+		case ITEM_SCORE:
+		{
+			char buf[1024];
 
-					/* Paranoia */
-					if (!initialized || character_icky ||
-					                !game_in_progress || !character_generated)
-					{
-						/* Can't happen but just in case */
-						plog("You may not do that right now.");
+			/* Paranoia */
+			if (!initialized || character_icky ||
+				!game_in_progress || !character_generated)
+			{
+				/* Can't happen but just in case */
+				plog("You may not do that right now.");
 
-						break;
-					}
+				break;
+			}
 
-					/* Build the pathname of the score file */
-					path_build(buf, sizeof(buf), ANGBAND_DIR_APEX,
-					           "scores.raw");
+			/* Build the pathname of the score file */
+			path_build(buf, sizeof(buf), ANGBAND_DIR_APEX,
+					   "scores.raw");
 
-					/* Hack - open the score file for reading */
-					highscore_fd = fd_open(buf, O_RDONLY);
+			/* Hack - open the score file for reading */
+			highscore_fd = fd_open(buf, O_RDONLY);
 
-					/* Paranoia - No score file */
-					if (highscore_fd < 0)
-					{
-						msg_print("Score file is not available.");
+			/* Paranoia - No score file */
+			if (highscore_fd < 0)
+			{
+				msg_print("Score file is not available.");
 
-						break;
-					}
+				break;
+			}
 
-					/* Mega-Hack - prevent various functions XXX XXX XXX */
-					initialized = FALSE;
+			/* Mega-Hack - prevent various functions XXX XXX XXX */
+			initialized = FALSE;
 
-					/* Save screen */
-					screen_save();
+			/* Save screen */
+			screen_save();
 
-					/* Clear screen */
-					Term_clear();
+			/* Clear screen */
+			Term_clear();
 
-					/* Prepare scores */
-					if (game_in_progress && character_generated)
-					{
-						predict_score();
-					}
+			/* Prepare scores */
+			if (game_in_progress && character_generated)
+			{
+				predict_score();
+			}
 
 #if 0 /* I don't like this - pelpel */
 
@@ -4909,158 +4861,83 @@ static void menu(long mc)
 
 #endif
 
-					/* Close the high score file */
-					(void)fd_close(highscore_fd);
+			/* Close the high score file */
+			(void)fd_close(highscore_fd);
 
-					/* Forget the fd */
-					highscore_fd = -1;
+			/* Forget the fd */
+			highscore_fd = -1;
 
-					/* Restore screen */
-					screen_load();
+			/* Restore screen */
+			screen_load();
 
-					/* Hack - Flush it */
-					Term_fresh();
+			/* Hack - Flush it */
+			Term_fresh();
 
-					/* Mega-Hack - We are ready again */
-					initialized = TRUE;
+			/* Mega-Hack - We are ready again */
+			initialized = TRUE;
 
-					/* Done */
-					break;
-				}
+			/* Done */
+			break;
+		}
 
 #endif /* HAS_SCORE_MENU */
 
-				/* Quit (with save) */
-			case ITEM_QUIT:
-				{
-					/* Save the game (if necessary) */
-					if (game_in_progress && character_generated)
-					{
-						/* Hack -- Forget messages */
-						msg_flag = FALSE;
+			/* Quit (with save) */
+		case ITEM_QUIT:
+		{
+			/* Save the game (if necessary) */
+			if (game_in_progress && character_generated)
+			{
+				/* Hack -- Forget messages */
+				msg_flag = FALSE;
 
-						/* Save the game */
+				/* Save the game */
 #ifndef ZANG_AUTO_SAVE
-						do_cmd_save_game();
+				do_cmd_save_game();
 #else
-						do_cmd_save_game(FALSE);
+				do_cmd_save_game(FALSE);
 #endif /* !ZANG_AUTO_SAVE */
-					}
-
-					/* Quit */
-					quit(NULL);
-					break;
-				}
 			}
+
+			/* Quit */
+			quit(NULL);
 			break;
 		}
+		}
+		break;
+	}
 
 		/* Edit menu */
 	case MENU_EDIT:
-		{
-			/* Unused */
-			break;
-		}
+	{
+		/* Unused */
+		break;
+	}
 
 		/* Font menu */
 	case MENU_FONT:
+	{
+		/* Require a window */
+		if (!td)
+			break;
+
+		/* Memorize old */
+		old_win = active;
+
+		/* Activate */
+		activate(td->w);
+
+		/* Toggle the "bold" setting */
+		if (selection == ITEM_BOLD)
 		{
-			/* Require a window */
-			if (!td) break;
-
-			/* Memorize old */
-			old_win = active;
-
-			/* Activate */
-			activate(td->w);
-
-			/* Toggle the "bold" setting */
-			if (selection == ITEM_BOLD)
+			/* Toggle the setting */
+			if (td->font_face & bold)
 			{
-				/* Toggle the setting */
-				if (td->font_face & bold)
-				{
-					td->font_face &= ~bold;
-				}
-				else
-				{
-					td->font_face |= bold;
-				}
-
-				/* Hack - clear tile size info XXX XXX */
-				td->tile_wid = td->tile_hgt = 0;
-
-				/* Apply and Verify */
-				term_data_check_font(td);
-				term_data_check_size(td);
-
-				/* Resize and Redraw */
-				term_data_resize(td);
-				term_data_redraw(td);
-
-				break;
+				td->font_face &= ~bold;
 			}
-
-			/* Toggle the "wide" setting */
-			if (selection == ITEM_WIDE)
+			else
 			{
-				/* Toggle the setting */
-				if (td->font_face & extend)
-				{
-					td->font_face &= ~extend;
-				}
-				else
-				{
-					td->font_face |= extend;
-				}
-
-				/* Hack - clear tile size info XXX XXX */
-				td->tile_wid = td->tile_hgt = 0;
-
-				/* Apply and Verify */
-				term_data_check_font(td);
-				term_data_check_size(td);
-
-				/* Resize and Redraw */
-				term_data_resize(td);
-				term_data_redraw(td);
-
-				break;
-			}
-
-			/* Get a new font name */
-			GetMenuItemText(GetMenuHandle(MENU_FONT), selection, s);
-			GetFNum(s, &fid);
-
-			/* Save the new font id */
-			td->font_id = fid;
-
-			/* Current size is bad for new font */
-			if (!RealFont(td->font_id, td->font_size))
-			{
-				/* Find similar size */
-				for (i = 1; i <= 32; i++)
-				{
-					/* Adjust smaller */
-					if (td->font_size - i >= 8)
-					{
-						if (RealFont(td->font_id, td->font_size - i))
-						{
-							td->font_size -= i;
-							break;
-						}
-					}
-
-					/* Adjust larger */
-					if (td->font_size + i <= 128)
-					{
-						if (RealFont(td->font_id, td->font_size + i))
-						{
-							td->font_size += i;
-							break;
-						}
-					}
-				}
+				td->font_face |= bold;
 			}
 
 			/* Hack - clear tile size info XXX XXX */
@@ -5074,235 +4951,312 @@ static void menu(long mc)
 			term_data_resize(td);
 			term_data_redraw(td);
 
-			/* Restore the window */
-			activate(old_win);
+			break;
+		}
+
+		/* Toggle the "wide" setting */
+		if (selection == ITEM_WIDE)
+		{
+			/* Toggle the setting */
+			if (td->font_face & extend)
+			{
+				td->font_face &= ~extend;
+			}
+			else
+			{
+				td->font_face |= extend;
+			}
+
+			/* Hack - clear tile size info XXX XXX */
+			td->tile_wid = td->tile_hgt = 0;
+
+			/* Apply and Verify */
+			term_data_check_font(td);
+			term_data_check_size(td);
+
+			/* Resize and Redraw */
+			term_data_resize(td);
+			term_data_redraw(td);
 
 			break;
 		}
+
+		/* Get a new font name */
+		GetMenuItemText(GetMenuHandle(MENU_FONT), selection, s);
+		GetFNum(s, &fid);
+
+		/* Save the new font id */
+		td->font_id = fid;
+
+		/* Current size is bad for new font */
+		if (!RealFont(td->font_id, td->font_size))
+		{
+			/* Find similar size */
+			for (i = 1; i <= 32; i++)
+			{
+				/* Adjust smaller */
+				if (td->font_size - i >= 8)
+				{
+					if (RealFont(td->font_id, td->font_size - i))
+					{
+						td->font_size -= i;
+						break;
+					}
+				}
+
+				/* Adjust larger */
+				if (td->font_size + i <= 128)
+				{
+					if (RealFont(td->font_id, td->font_size + i))
+					{
+						td->font_size += i;
+						break;
+					}
+				}
+			}
+		}
+
+		/* Hack - clear tile size info XXX XXX */
+		td->tile_wid = td->tile_hgt = 0;
+
+		/* Apply and Verify */
+		term_data_check_font(td);
+		term_data_check_size(td);
+
+		/* Resize and Redraw */
+		term_data_resize(td);
+		term_data_redraw(td);
+
+		/* Restore the window */
+		activate(old_win);
+
+		break;
+	}
 
 		/* Size menu */
 	case MENU_SIZE:
-		{
-			if (!td) break;
-
-			/* Save old */
-			old_win = active;
-
-			/* Activate */
-			activate(td->w);
-
-			td->font_size = menu_size_values[selection];
-
-			/* Hack - clear tile size info XXX XXX */
-			td->tile_wid = td->tile_hgt = 0;
-
-			/* Apply and Verify */
-			term_data_check_font(td);
-			term_data_check_size(td);
-
-			/* Resize and Redraw */
-			term_data_resize(td);
-			term_data_redraw(td);
-
-			/* Restore */
-			activate(old_win);
-
+	{
+		if (!td)
 			break;
-		}
+
+		/* Save old */
+		old_win = active;
+
+		/* Activate */
+		activate(td->w);
+
+		td->font_size = menu_size_values[selection];
+
+		/* Hack - clear tile size info XXX XXX */
+		td->tile_wid = td->tile_hgt = 0;
+
+		/* Apply and Verify */
+		term_data_check_font(td);
+		term_data_check_size(td);
+
+		/* Resize and Redraw */
+		term_data_resize(td);
+		term_data_redraw(td);
+
+		/* Restore */
+		activate(old_win);
+
+		break;
+	}
 
 		/* Window menu */
 	case MENU_WINDOWS:
-		{
-			/* Parse */
-			i = selection - 1;
+	{
+		/* Parse */
+		i = selection - 1;
 
-			/* Check legality of choice */
-			if ((i < 0) || (i >= MAX_TERM_DATA)) break;
-
-			/* Obtain the window */
-			td = &data[i];
-
-			/* Mapped */
-			td->mapped = TRUE;
-
-			/* Link */
-			term_data_link(i);
-
-			/* Mapped (?) */
-			td->t->mapped_flag = TRUE;
-
-			/* Show the window */
-			TransitionWindow(td->w,
-			                 kWindowZoomTransitionEffect,
-			                 kWindowShowTransitionAction,
-			                 NULL);
-
-			/* Bring to the front */
-			SelectWindow(td->w);
-
+		/* Check legality of choice */
+		if ((i < 0) || (i >= MAX_TERM_DATA))
 			break;
-		}
+
+		/* Obtain the window */
+		td = &data[i];
+
+		/* Mapped */
+		td->mapped = TRUE;
+
+		/* Link */
+		term_data_link(i);
+
+		/* Mapped (?) */
+		td->t->mapped_flag = TRUE;
+
+		/* Show the window */
+		TransitionWindow(td->w,
+						 kWindowZoomTransitionEffect,
+						 kWindowShowTransitionAction,
+						 NULL);
+
+		/* Bring to the front */
+		SelectWindow(td->w);
+
+		break;
+	}
 
 		/* Special menu */
 	case MENU_SPECIAL:
+	{
+		switch (selection)
 		{
-			switch (selection)
-			{
-			case ITEM_SOUND:
-				{
-					/* Toggle arg_sound */
-					arg_sound = !arg_sound;
+		case ITEM_SOUND:
+		{
+			/* Toggle arg_sound */
+			arg_sound = !arg_sound;
 
-					/* React to changes */
-					Term_xtra(TERM_XTRA_REACT, 0);
-
-					break;
-				}
-
-			case ITEM_FIDDLE:
-				{
-					arg_fiddle = !arg_fiddle;
-
-					break;
-				}
-
-			case ITEM_WIZARD:
-				{
-					arg_wizard = !arg_wizard;
-
-					break;
-				}
-			}
+			/* React to changes */
+			Term_xtra(TERM_XTRA_REACT, 0);
 
 			break;
 		}
+
+		case ITEM_FIDDLE:
+		{
+			arg_fiddle = !arg_fiddle;
+
+			break;
+		}
+
+		case ITEM_WIZARD:
+		{
+			arg_wizard = !arg_wizard;
+
+			break;
+		}
+		}
+
+		break;
+	}
 
 		/* Graphics submenu */
 	case SUBMENU_GRAPH:
+	{
+		switch (selection)
 		{
-			switch (selection)
-			{
-			case ITEM_NONE:
-				{
-					graf_mode_req = GRAF_MODE_NONE;
+		case ITEM_NONE:
+		{
+			graf_mode_req = GRAF_MODE_NONE;
 
-					break;
-				}
+			break;
+		}
 
-			case ITEM_8X8:
-				{
-					graf_mode_req = GRAF_MODE_8X8;
+		case ITEM_8X8:
+		{
+			graf_mode_req = GRAF_MODE_8X8;
 
-					break;
-				}
+			break;
+		}
 
-			case ITEM_16X16:
-				{
-					graf_mode_req = GRAF_MODE_16X16;
+		case ITEM_16X16:
+		{
+			graf_mode_req = GRAF_MODE_16X16;
 
-					break;
-				}
+			break;
+		}
 
-			case ITEM_32X32:
-				{
-					graf_mode_req = GRAF_MODE_32X32;
+		case ITEM_32X32:
+		{
+			graf_mode_req = GRAF_MODE_32X32;
 
-					break;
-				}
+			break;
+		}
 
 #ifdef USE_DOUBLE_TILES
 
-			case ITEM_BIGTILE:
-				{
-					term *old = Term;
-					term_data *td = &data[0];
+		case ITEM_BIGTILE:
+		{
+			term *old = Term;
+			term_data *td = &data[0];
 
-					/* Toggle "use_bigtile" */
-					use_bigtile = !use_bigtile;
-					arg_bigtile = use_bigtile;
+			/* Toggle "use_bigtile" */
+			use_bigtile = !use_bigtile;
+			arg_bigtile = use_bigtile;
 
-					/* Activate */
-					Term_activate(td->t);
+			/* Activate */
+			Term_activate(td->t);
 
-					/* Resize the term */
-					Term_resize(td->cols, td->rows);
+			/* Resize the term */
+			Term_resize(td->cols, td->rows);
 
-					/* Activate old */
-					Term_activate(old);
-
-					break;
-				}
-
-#endif /* USE_DOUBLE_TILES */
-
-			}
-
-			/* Hack -- Force redraw */
-			Term_key_push(KTRL('R'));
+			/* Activate old */
+			Term_activate(old);
 
 			break;
 		}
+
+#endif /* USE_DOUBLE_TILES */
+		}
+
+		/* Hack -- Force redraw */
+		Term_key_push(KTRL('R'));
+
+		break;
+	}
 
 		/* TileWidth menu */
 	case SUBMENU_TILEWIDTH:
-		{
-			if (!td) break;
-
-			/* Save old */
-			old_win = active;
-
-			/* Activate */
-			activate(td->w);
-
-			/* Analyse value */
-			td->tile_wid = menu_tilewidth_values[selection];
-
-			/* Apply and Verify */
-			term_data_check_size(td);
-
-			/* Resize and Redraw */
-			term_data_resize(td);
-			term_data_redraw(td);
-
-			/* Restore */
-			activate(old_win);
-
+	{
+		if (!td)
 			break;
-		}
+
+		/* Save old */
+		old_win = active;
+
+		/* Activate */
+		activate(td->w);
+
+		/* Analyse value */
+		td->tile_wid = menu_tilewidth_values[selection];
+
+		/* Apply and Verify */
+		term_data_check_size(td);
+
+		/* Resize and Redraw */
+		term_data_resize(td);
+		term_data_redraw(td);
+
+		/* Restore */
+		activate(old_win);
+
+		break;
+	}
 
 		/* TileHeight menu */
 	case SUBMENU_TILEHEIGHT:
-		{
-			if (!td) break;
-
-			/* Save old */
-			old_win = active;
-
-			/* Activate */
-			activate(td->w);
-
-			/* Analyse value */
-			td->tile_hgt = menu_tileheight_values[selection];
-
-			/* Apply and Verify */
-			term_data_check_size(td);
-
-			/* Resize and Redraw */
-			term_data_resize(td);
-			term_data_redraw(td);
-
-			/* Restore */
-			activate(old_win);
-
+	{
+		if (!td)
 			break;
-		}
-	}
 
+		/* Save old */
+		old_win = active;
+
+		/* Activate */
+		activate(td->w);
+
+		/* Analyse value */
+		td->tile_hgt = menu_tileheight_values[selection];
+
+		/* Apply and Verify */
+		term_data_check_size(td);
+
+		/* Resize and Redraw */
+		term_data_resize(td);
+		term_data_redraw(td);
+
+		/* Restore */
+		activate(old_win);
+
+		break;
+	}
+	}
 
 	/* Clean the menu */
 	HiliteMenu(0);
 }
-
 
 /*
  * Check for extra required parameters -- From "Maarten Hazewinkel"
@@ -5314,32 +5268,32 @@ static OSErr CheckRequiredAEParams(const AppleEvent *theAppleEvent)
 	Size actualSize;
 
 	aeError = AEGetAttributePtr(
-	                  theAppleEvent, keyMissedKeywordAttr, typeWildCard,
-	                  &returnedType, NULL, 0, &actualSize);
+		theAppleEvent, keyMissedKeywordAttr, typeWildCard,
+		&returnedType, NULL, 0, &actualSize);
 
-	if (aeError == errAEDescNotFound) return (noErr);
+	if (aeError == errAEDescNotFound)
+		return (noErr);
 
-	if (aeError == noErr) return (errAEParamMissed);
+	if (aeError == noErr)
+		return (errAEParamMissed);
 
 	return (aeError);
 }
-
 
 /*
  * Apple Event Handler -- Open Application
  */
 static OSErr AEH_Start(const AppleEvent *theAppleEvent, AppleEvent *reply,
-                       SInt32 handlerRefCon)
+					   SInt32 handlerRefCon)
 {
 	return (CheckRequiredAEParams(theAppleEvent));
 }
-
 
 /*
  * Apple Event Handler -- Quit Application
  */
 static OSErr AEH_Quit(const AppleEvent *theAppleEvent, AppleEvent *reply,
-                      SInt32 handlerRefCon)
+					  SInt32 handlerRefCon)
 {
 	/* Quit later */
 	quit_when_ready = TRUE;
@@ -5348,16 +5302,14 @@ static OSErr AEH_Quit(const AppleEvent *theAppleEvent, AppleEvent *reply,
 	return (CheckRequiredAEParams(theAppleEvent));
 }
 
-
 /*
  * Apple Event Handler -- Print Documents
  */
 static OSErr AEH_Print(const AppleEvent *theAppleEvent, AppleEvent *reply,
-                       SInt32 handlerRefCon)
+					   SInt32 handlerRefCon)
 {
 	return (errAEEventNotHandled);
 }
-
 
 /*
  * Apple Event Handler by Steve Linberg (slinberg@crocker.com).
@@ -5373,8 +5325,8 @@ static OSErr AEH_Print(const AppleEvent *theAppleEvent, AppleEvent *reply,
  * snippet from Think Reference 2.0.  (The prior sentence could read
  * "shamelessly swiped & hacked")
  */
-static OSErr AEH_Open(const AppleEvent *theAppleEvent, AppleEvent* reply,
-                      SInt32 handlerRefCon)
+static OSErr AEH_Open(const AppleEvent *theAppleEvent, AppleEvent *reply,
+					  SInt32 handlerRefCon)
 {
 	FSSpec myFSS;
 	AEDescList docList;
@@ -5387,17 +5339,19 @@ static OSErr AEH_Open(const AppleEvent *theAppleEvent, AppleEvent* reply,
 
 	/* Put the direct parameter (a descriptor list) into a docList */
 	err = AEGetParamDesc(
-	              theAppleEvent, keyDirectObject, typeAEList, &docList);
-	if (err) return err;
+		theAppleEvent, keyDirectObject, typeAEList, &docList);
+	if (err)
+		return err;
 
 	/*
 	 * We ignore the validity check, because we trust the FInder, and we only
 	 * allow one savefile to be opened, so we ignore the depth of the list.
 	 */
 	err = AEGetNthPtr(
-	              &docList, 1L, typeFSS, &keywd, &returnedType,
-	              (Ptr) & myFSS, sizeof(myFSS), &actualSize);
-	if (err) return err;
+		&docList, 1L, typeFSS, &keywd, &returnedType,
+		(Ptr)&myFSS, sizeof(myFSS), &actualSize);
+	if (err)
+		return err;
 
 	/* Only needed to check savefile type below */
 	err = FSpGetFInfo(&myFSS, &myFileInfo);
@@ -5409,7 +5363,8 @@ static OSErr AEH_Open(const AppleEvent *theAppleEvent, AppleEvent* reply,
 	}
 
 	/* Ignore non 'SAVE' files */
-	if (myFileInfo.fdType != 'SAVE') return noErr;
+	if (myFileInfo.fdType != 'SAVE')
+		return noErr;
 
 #ifdef MACH_O_CARBON
 
@@ -5437,7 +5392,6 @@ static OSErr AEH_Open(const AppleEvent *theAppleEvent, AppleEvent* reply,
 	return noErr;
 }
 
-
 /*
  * Handle quit_when_ready, by Peter Ammon,
  * slightly modified to check inkey_flag.
@@ -5445,7 +5399,8 @@ static OSErr AEH_Open(const AppleEvent *theAppleEvent, AppleEvent* reply,
 static void quit_calmly(void)
 {
 	/* Quit immediately if game's not started */
-	if (!game_in_progress || !character_generated) quit(NULL);
+	if (!game_in_progress || !character_generated)
+		quit(NULL);
 
 	/* Save the game and Quit (if it's safe) */
 	if (inkey_flag)
@@ -5466,7 +5421,6 @@ static void quit_calmly(void)
 
 	/* Wait until inkey_flag is set */
 }
-
 
 /*
  * Macintosh modifiers (event.modifier & ccc):
@@ -5518,7 +5472,6 @@ static void quit_calmly(void)
  * Up:126
  */
 
-
 /*
  * Check for Events, return TRUE if we process any
  *
@@ -5544,7 +5497,6 @@ static bool CheckEvents(bool wait)
 
 	term_data *td = NULL;
 
-
 	/*
 	 * With the wait mode blocking for available event / timeout,
 	 * the non-wait mode should actually call WaitNextEvent,
@@ -5553,20 +5505,23 @@ static bool CheckEvents(bool wait)
 	 */
 
 	/* Handles the quit_when_ready flag */
-	if (quit_when_ready) quit_calmly();
+	if (quit_when_ready)
+		quit_calmly();
 
 	/* Blocking call to WaitNextEvent - should use MAX_INT XXX XXX */
-	if (wait) sleep_ticks = 0x7FFFFFFFL;
+	if (wait)
+		sleep_ticks = 0x7FFFFFFFL;
 
 	/* Non-blocking */
-	else sleep_ticks = 0L;
+	else
+		sleep_ticks = 0L;
 
 	/* Get an event (or null)  */
 	WaitNextEvent(everyEvent, &event, sleep_ticks, nil);
 
 	/* Hack -- Nothing is ready yet */
-	if (event.what == nullEvent) return (FALSE);
-
+	if (event.what == nullEvent)
+		return (FALSE);
 
 	/* Analyze the event */
 	switch (event.what)
@@ -5586,325 +5541,343 @@ static bool CheckEvents(bool wait)
 #endif
 
 	case updateEvt:
+	{
+		/* Extract the window */
+		w = (WindowPtr)event.message;
+
+		/* Find the window */
+		for (i = 0; i < MAX_TERM_DATA; i++)
 		{
-			/* Extract the window */
-			w = (WindowPtr)event.message;
+			/* Skip dead windows */
+			if (!data[i].t)
+				continue;
 
-			/* Find the window */
-			for (i = 0; i < MAX_TERM_DATA; i++)
-			{
-				/* Skip dead windows */
-				if (!data[i].t) continue;
-
-				/* Notice matches */
-				if (data[i].w == w) td = &data[i];
-			}
-
-			/* Hack XXX XXX XXX */
-			BeginUpdate(w);
-			EndUpdate(w);
-
-			/* Redraw the window */
-			if (td) term_data_redraw(td);
-
-			break;
+			/* Notice matches */
+			if (data[i].w == w)
+				td = &data[i];
 		}
+
+		/* Hack XXX XXX XXX */
+		BeginUpdate(w);
+		EndUpdate(w);
+
+		/* Redraw the window */
+		if (td)
+			term_data_redraw(td);
+
+		break;
+	}
 
 	case keyDown:
 	case autoKey:
+	{
+		/* Extract some modifiers */
+		mc = (event.modifiers & controlKey) ? TRUE : FALSE;
+		ms = (event.modifiers & shiftKey) ? TRUE : FALSE;
+		mo = (event.modifiers & optionKey) ? TRUE : FALSE;
+		mx = (event.modifiers & cmdKey) ? TRUE : FALSE;
+
+		/* Keypress: (only "valid" if ck < 96) */
+		ch = (event.message & charCodeMask) & 255;
+
+		/* Keycode: see table above */
+		ck = ((event.message & keyCodeMask) >> 8) & 255;
+
+		/* Command + "normal key" -> menu action */
+		if (mx && (ck < 64))
 		{
-			/* Extract some modifiers */
-			mc = (event.modifiers & controlKey) ? TRUE : FALSE;
-			ms = (event.modifiers & shiftKey) ? TRUE : FALSE;
-			mo = (event.modifiers & optionKey) ? TRUE : FALSE;
-			mx = (event.modifiers & cmdKey) ? TRUE : FALSE;
-
-			/* Keypress: (only "valid" if ck < 96) */
-			ch = (event.message & charCodeMask) & 255;
-
-			/* Keycode: see table above */
-			ck = ((event.message & keyCodeMask) >> 8) & 255;
-
-			/* Command + "normal key" -> menu action */
-			if (mx && (ck < 64))
-			{
 #ifdef MENU_SHORTCUTS
-				/* Hack -- Prepare the menus */
-				setup_menus();
+			/* Hack -- Prepare the menus */
+			setup_menus();
 
-				/* Run the Menu-Handler */
-				menu(MenuKey(ch));
+			/* Run the Menu-Handler */
+			menu(MenuKey(ch));
 
-				/* Turn off the menus */
-				HiliteMenu(0);
+			/* Turn off the menus */
+			HiliteMenu(0);
 
-				/* Done */
-				break;
+			/* Done */
+			break;
 #else
-				/* Begin special trigger */
-				Term_keypress(31);
+			/* Begin special trigger */
+			Term_keypress(31);
 
-				/* Send some modifier keys */
-				if (mc) Term_keypress('C');
-				if (ms) Term_keypress('S');
-				if (mo) Term_keypress('O');
-				if (mx) Term_keypress('X');
+			/* Send some modifier keys */
+			if (mc)
+				Term_keypress('C');
+			if (ms)
+				Term_keypress('S');
+			if (mo)
+				Term_keypress('O');
+			if (mx)
+				Term_keypress('X');
 
-				/* Enqueue the keypress */
-				Term_keypress(ch);
+			/* Enqueue the keypress */
+			Term_keypress(ch);
 
-				/* Terminate the trigger */
-				Term_keypress(13);
+			/* Terminate the trigger */
+			Term_keypress(13);
 #endif
-			}
+		}
 
-			/* Hide the mouse pointer */
-			ObscureCursor();
+		/* Hide the mouse pointer */
+		ObscureCursor();
 
-			/* Normal key -> simple keypress */
-			if ((ck < 64) || (ck == 93))
+		/* Normal key -> simple keypress */
+		if ((ck < 64) || (ck == 93))
+		{
+			/* Enqueue the keypress */
+			Term_keypress(ch);
+		}
+
+		/* Keypad keys -> trigger plus simple keypress */
+		else if (!mc && !ms && !mo && !mx && (ck < 96))
+		{
+			/* Hack -- "enter" is confused */
+			if (ck == 76)
+				ch = '\n';
+
+			/* Begin special trigger */
+			Term_keypress(31);
+
+			/* Send the "keypad" modifier */
+			Term_keypress('K');
+
+			/* Send the "ascii" keypress */
+			Term_keypress(ch);
+
+			/* Terminate the trigger */
+			Term_keypress(13);
+		}
+
+		/* Bizarre key -> encoded keypress */
+		else if (ck <= 127)
+		{
+			/* Begin special trigger */
+			Term_keypress(31);
+
+			/* Send some modifier keys */
+			if (mc)
+				Term_keypress('C');
+			if (ms)
+				Term_keypress('S');
+			if (mo)
+				Term_keypress('O');
+			if (mx)
+				Term_keypress('X');
+
+			/* Downshift and encode the keycode */
+			Term_keypress(I2D((ck - 64) / 10));
+			Term_keypress(I2D((ck - 64) % 10));
+
+			/* Terminate the trigger */
+			Term_keypress(13);
+		}
+
+		break;
+	}
+
+	case mouseDown:
+	{
+		int code;
+
+		/* Analyze click location */
+		code = FindWindow(event.where, &w);
+
+		/* Find the window */
+		for (i = 0; i < MAX_TERM_DATA; i++)
+		{
+			/* Skip dead windows */
+			if (!data[i].t)
+				continue;
+
+			/* Notice matches */
+			if (data[i].w == w)
+				td = &data[i];
+		}
+
+		/* Analyze */
+		switch (code)
+		{
+		case inMenuBar:
+		{
+			setup_menus();
+			menu(MenuSelect(event.where));
+			HiliteMenu(0);
+			break;
+		}
+
+		case inDrag:
+		{
+			WindowPtr old_win;
+			BitMap tBitMap;
+			Rect pRect;
+
+			r = GetQDGlobalsScreenBits(&tBitMap)->bounds;
+			r.top += 20; /* GetMBarHeight() XXX XXX XXX */
+			InsetRect(&r, 4, 4);
+			DragWindow(w, event.where, &r);
+
+			/* Oops */
+			if (!td)
+				break;
+
+			/* Save */
+			old_win = active;
+
+			/* Activate */
+			activate(td->w);
+
+			/* Analyze */
+			GetWindowBounds(
+				(WindowRef)td->w,
+				kWindowContentRgn,
+				&pRect);
+			td->r.left = pRect.left;
+			td->r.top = pRect.top;
+
+			/* Apply and Verify */
+			term_data_check_size(td);
+
+			/* Restore */
+			activate(old_win);
+
+			break;
+		}
+
+		case inGoAway:
+		{
+			/* Oops */
+			if (!td)
+				break;
+
+			/* Track the go-away box */
+			if (TrackGoAway(w, event.where))
 			{
-				/* Enqueue the keypress */
-				Term_keypress(ch);
-			}
+				/* Not Mapped */
+				td->mapped = FALSE;
 
-			/* Keypad keys -> trigger plus simple keypress */
-			else if (!mc && !ms && !mo && !mx && (ck < 96))
-			{
-				/* Hack -- "enter" is confused */
-				if (ck == 76) ch = '\n';
+				/* Not Mapped */
+				td->t->mapped_flag = FALSE;
 
-				/* Begin special trigger */
-				Term_keypress(31);
-
-				/* Send the "keypad" modifier */
-				Term_keypress('K');
-
-				/* Send the "ascii" keypress */
-				Term_keypress(ch);
-
-				/* Terminate the trigger */
-				Term_keypress(13);
-			}
-
-			/* Bizarre key -> encoded keypress */
-			else if (ck <= 127)
-			{
-				/* Begin special trigger */
-				Term_keypress(31);
-
-				/* Send some modifier keys */
-				if (mc) Term_keypress('C');
-				if (ms) Term_keypress('S');
-				if (mo) Term_keypress('O');
-				if (mx) Term_keypress('X');
-
-				/* Downshift and encode the keycode */
-				Term_keypress(I2D((ck - 64) / 10));
-				Term_keypress(I2D((ck - 64) % 10));
-
-				/* Terminate the trigger */
-				Term_keypress(13);
+				/* Hide the window */
+				TransitionWindow(td->w,
+								 kWindowZoomTransitionEffect,
+								 kWindowHideTransitionAction,
+								 NULL);
 			}
 
 			break;
 		}
 
-	case mouseDown:
+		case inGrow:
 		{
-			int code;
+			int x, y;
 
-			/* Analyze click location */
-			code = FindWindow(event.where, &w);
+			Rect nr;
 
-			/* Find the window */
-			for (i = 0; i < MAX_TERM_DATA; i++)
-			{
-				/* Skip dead windows */
-				if (!data[i].t) continue;
+			term *old = Term;
 
-				/* Notice matches */
-				if (data[i].w == w) td = &data[i];
-			}
-
-			/* Analyze */
-			switch (code)
-			{
-			case inMenuBar:
-				{
-					setup_menus();
-					menu(MenuSelect(event.where));
-					HiliteMenu(0);
-					break;
-				}
-
-			case inDrag:
-				{
-					WindowPtr old_win;
-					BitMap tBitMap;
-					Rect pRect;
-
-					r = GetQDGlobalsScreenBits(&tBitMap)->bounds;
-					r.top += 20;  /* GetMBarHeight() XXX XXX XXX */
-					InsetRect(&r, 4, 4);
-					DragWindow(w, event.where, &r);
-
-					/* Oops */
-					if (!td) break;
-
-					/* Save */
-					old_win = active;
-
-					/* Activate */
-					activate(td->w);
-
-					/* Analyze */
-					GetWindowBounds(
-					        (WindowRef)td->w,
-					        kWindowContentRgn,
-					        &pRect);
-					td->r.left = pRect.left;
-					td->r.top = pRect.top;
-
-					/* Apply and Verify */
-					term_data_check_size(td);
-
-					/* Restore */
-					activate(old_win);
-
-					break;
-				}
-
-			case inGoAway:
-				{
-					/* Oops */
-					if (!td) break;
-
-					/* Track the go-away box */
-					if (TrackGoAway(w, event.where))
-					{
-						/* Not Mapped */
-						td->mapped = FALSE;
-
-						/* Not Mapped */
-						td->t->mapped_flag = FALSE;
-
-						/* Hide the window */
-						TransitionWindow(td->w,
-						                 kWindowZoomTransitionEffect,
-						                 kWindowHideTransitionAction,
-						                 NULL);
-					}
-
-					break;
-				}
-
-			case inGrow:
-				{
-					int x, y;
-
-					Rect nr;
-
-					term *old = Term;
-
-					/* Oops */
-					if (!td) break;
+			/* Oops */
+			if (!td)
+				break;
 
 #ifndef ALLOW_BIG_SCREEN
 
-					/* Minimum and maximum sizes */
-					r.left = 20 * td->tile_wid + td->size_ow1;
-					r.right = 80 * td->tile_wid + td->size_ow1 + td->size_ow2 + 1;
-					r.top = 1 * td->tile_hgt + td->size_oh1;
-					r.bottom = 24 * td->tile_hgt + td->size_oh1 + td->size_oh2 + 1;
+			/* Minimum and maximum sizes */
+			r.left = 20 * td->tile_wid + td->size_ow1;
+			r.right = 80 * td->tile_wid + td->size_ow1 + td->size_ow2 + 1;
+			r.top = 1 * td->tile_hgt + td->size_oh1;
+			r.bottom = 24 * td->tile_hgt + td->size_oh1 + td->size_oh2 + 1;
 
-					/* Grow the rectangle */
-					if (!ResizeWindow(w, event.where, &r, NULL)) break;
+			/* Grow the rectangle */
+			if (!ResizeWindow(w, event.where, &r, NULL))
+				break;
 #else
 
-					/* Grow the rectangle */
-					if (!ResizeWindow(w, event.where, NULL, NULL)) break;
+			/* Grow the rectangle */
+			if (!ResizeWindow(w, event.where, NULL, NULL))
+				break;
 
 #endif /* !ALLOW_BIG_SCREEN */
 
+			/* Obtain geometry of resized window */
+			GetWindowBounds(w, kWindowContentRgn, &nr);
 
-					/* Obtain geometry of resized window */
-					GetWindowBounds(w, kWindowContentRgn, &nr);
+			/* Extract the new size in pixels */
+			y = nr.bottom - nr.top - td->size_oh1 - td->size_oh2;
+			x = nr.right - nr.left - td->size_ow1 - td->size_ow2;
 
-					/* Extract the new size in pixels */
-					y = nr.bottom - nr.top - td->size_oh1 - td->size_oh2;
-					x = nr.right - nr.left - td->size_ow1 - td->size_ow2;
+			/* Extract a "close" approximation */
+			td->rows = y / td->tile_hgt;
+			td->cols = x / td->tile_wid;
 
-					/* Extract a "close" approximation */
-					td->rows = y / td->tile_hgt;
-					td->cols = x / td->tile_wid;
+			/* Apply and Verify */
+			term_data_check_size(td);
 
-					/* Apply and Verify */
-					term_data_check_size(td);
+			/* Activate */
+			Term_activate(td->t);
 
-					/* Activate */
-					Term_activate(td->t);
+			/* Hack -- Resize the term */
+			Term_resize(td->cols, td->rows);
 
-					/* Hack -- Resize the term */
-					Term_resize(td->cols, td->rows);
+			/* Resize and Redraw */
+			term_data_resize(td);
+			term_data_redraw(td);
 
-					/* Resize and Redraw */
-					term_data_resize(td);
-					term_data_redraw(td);
-
-					/* Restore */
-					Term_activate(old);
-
-					break;
-				}
-
-			case inContent:
-				{
-					SelectWindow(w);
-
-					break;
-				}
-			}
+			/* Restore */
+			Term_activate(old);
 
 			break;
 		}
+
+		case inContent:
+		{
+			SelectWindow(w);
+
+			break;
+		}
+		}
+
+		break;
+	}
 
 		/* OS Event -- From "Maarten Hazewinkel" */
 	case osEvt:
+	{
+		switch ((event.message >> 24) & 0x000000FF)
 		{
-			switch ((event.message >> 24) & 0x000000FF)
+		case suspendResumeMessage:
+
+			/* Resuming: activate the front window */
+			if (event.message & resumeFlag)
 			{
-			case suspendResumeMessage:
+				Cursor tempCursor;
+				SetPort(GetWindowPort(FrontWindow()));
+				SetCursor(GetQDGlobalsArrow(&tempCursor));
+			}
 
-				/* Resuming: activate the front window */
-				if (event.message & resumeFlag)
-				{
-					Cursor tempCursor;
-					SetPort(GetWindowPort(FrontWindow()));
-					SetCursor(GetQDGlobalsArrow(&tempCursor));
-				}
-
-				/* Suspend: deactivate the front window */
-				else
-				{
-					/* Nothing */
-				}
-
-				break;
+			/* Suspend: deactivate the front window */
+			else
+			{
+				/* Nothing */
 			}
 
 			break;
 		}
 
+		break;
+	}
+
 		/* From "Steve Linberg" and "Maarten Hazewinkel" */
 	case kHighLevelEvent:
-		{
-			/* Process apple events */
-			(void)AEProcessAppleEvent(&event);
+	{
+		/* Process apple events */
+		(void)AEProcessAppleEvent(&event);
 
-			/* Handle "quit_when_ready" */
-			if (quit_when_ready)
-			{
+		/* Handle "quit_when_ready" */
+		if (quit_when_ready)
+		{
 #if 0 /* Doesn't work with Aqua well */
 				/* Forget */
 				quit_when_ready = FALSE;
@@ -5912,35 +5885,30 @@ static bool CheckEvents(bool wait)
 				/* Do the menu key */
 				menu(MenuKey('q'));
 #endif
-				/* Turn off the menus */
-				HiliteMenu(0);
-			}
-
-			/* Handle "open_when_ready" */
-			else if (open_when_ready)
-			{
-				handle_open_when_ready();
-			}
-
-			break;
+			/* Turn off the menus */
+			HiliteMenu(0);
 		}
 
-	}
+		/* Handle "open_when_ready" */
+		else if (open_when_ready)
+		{
+			handle_open_when_ready();
+		}
 
+		break;
+	}
+	}
 
 	/* Something happened */
 	return (TRUE);
 }
 
-
 /*** Some Hooks for various routines ***/
-
 
 /*
  * Mega-Hack -- emergency lifeboat
  */
 static void *lifeboat = NULL;
-
 
 /*
  * Hook to "release" memory
@@ -5985,7 +5953,6 @@ static void *hook_ralloc(size_t size)
 	return (NewPtr(size));
 
 #endif
-
 }
 
 /*
@@ -6008,13 +5975,13 @@ static void *hook_rpanic(size_t size)
 		mac_warning("Running out of Memory!\rAbort this process now!");
 
 		/* Mega-Hack -- Never leave this function */
-		while (TRUE) CheckEvents(TRUE);
+		while (TRUE)
+			CheckEvents(TRUE);
 	}
 
 	/* Mega-Hack -- Crash */
 	return (NULL);
 }
-
 
 /*
  * Hook to tell the user something important
@@ -6025,14 +5992,14 @@ static void hook_plog(cptr str)
 	mac_warning(str);
 }
 
-
 /*
  * Hook to tell the user something, and then quit
  */
 static void hook_quit(cptr str)
 {
 	/* Warning if needed */
-	if (str) mac_warning(str);
+	if (str)
+		mac_warning(str);
 
 #ifdef USE_ASYNC_SOUND
 
@@ -6061,7 +6028,6 @@ static void hook_quit(cptr str)
 	ExitToShell();
 }
 
-
 /*
  * Hook to tell the user something, and then crash
  */
@@ -6071,22 +6037,21 @@ static void hook_core(cptr str)
 	/* DebugStr(str); */
 
 	/* Warning */
-	if (str) mac_warning(str);
+	if (str)
+		mac_warning(str);
 
 	/* Warn, then save player */
 	mac_warning("Fatal error.\rI will now attempt to save and quit.");
 
 	/* Attempt to save */
-	if (!save_player()) mac_warning("Warning -- save failed!");
+	if (!save_player())
+		mac_warning("Warning -- save failed!");
 
 	/* Quit */
 	quit(NULL);
 }
 
-
-
 /*** Main program ***/
-
 
 /*
  * Init some stuff
@@ -6122,7 +6087,6 @@ static void init_stuff(void)
 	FSSpec theFolderSpec;
 	NavReplyRecord theReply;
 
-
 	/* Fake rectangle */
 	r.left = 0;
 	r.top = 0;
@@ -6139,11 +6103,11 @@ static void init_stuff(void)
 
 	/* Default to the "lib" folder with the application */
 #ifdef MACH_O_CARBON
-	if (locate_lib(path, sizeof(path)) == NULL) quit(NULL);
+	if (locate_lib(path, sizeof(path)) == NULL)
+		quit(NULL);
 #else
-	refnum_to_name(path, app_dir, app_vol, (char*)("\plib:"));
+	refnum_to_name(path, app_dir, app_vol, (char *)("\plib:"));
 #endif
-
 
 	/* Check until done */
 	while (1)
@@ -6155,7 +6119,8 @@ static void init_stuff(void)
 		path_build(path, 1024, ANGBAND_DIR_FILE, "news.txt");
 
 		/* Attempt to open and close that file */
-		if (0 == fd_close(fd_open(path, O_RDONLY))) break;
+		if (0 == fd_close(fd_open(path, O_RDONLY)))
+			break;
 
 		/* Warning */
 		plog_fmt("Unable to open the '%s' file.", path);
@@ -6167,7 +6132,8 @@ static void init_stuff(void)
 		err = NavGetDefaultDialogOptions(&dialogOptions);
 
 		/* Paranoia */
-		if (err != noErr) quit(NULL);
+		if (err != noErr)
+			quit(NULL);
 
 		/* Set default location option */
 		dialogOptions.dialogOptionFlags |= kNavSelectDefaultLocation;
@@ -6196,10 +6162,11 @@ static void init_stuff(void)
 
 		/* Wait for the user to choose a folder */
 		err = NavChooseFolder(
-		              nil, &theReply, &dialogOptions, nil, nil, nil);
+			nil, &theReply, &dialogOptions, nil, nil, nil);
 
 		/* Assume the player doesn't want to go on */
-		if ((err != noErr) || !theReply.validRecord) quit(NULL);
+		if ((err != noErr) || !theReply.validRecord)
+			quit(NULL);
 
 		/* Retrieve FSSpec from the reply */
 		{
@@ -6209,35 +6176,36 @@ static void init_stuff(void)
 
 			/* Get a pointer to selected folder */
 			err = AEGetNthPtr(
-			              &(theReply.selection), 1, typeFSS, &theKeyword,
-			              &actualType, &theFolderSpec, sizeof(FSSpec), &actualSize);
+				&(theReply.selection), 1, typeFSS, &theKeyword,
+				&actualType, &theFolderSpec, sizeof(FSSpec), &actualSize);
 
 			/* Paranoia */
-			if (err != noErr) quit(NULL);
+			if (err != noErr)
+				quit(NULL);
 		}
 
 		/* Free navitagor reply */
 		err = NavDisposeReply(&theReply);
 
 		/* Paranoia */
-		if (err != noErr) quit(NULL);
+		if (err != noErr)
+			quit(NULL);
 
-		/* Extract textual file name for given file */
+			/* Extract textual file name for given file */
 #ifdef MACH_O_CARBON
 		if (spec_to_path(&theFolderSpec, path, sizeof(path)) != noErr)
 		{
 			quit(NULL);
 		}
-#else /* MACH_O_CARBON */
-refnum_to_name(
-		path,
-		theFolderSpec.parID,
-		theFolderSpec.vRefNum,
-		(char *)theFolderSpec.name);
+#else  /* MACH_O_CARBON */
+		refnum_to_name(
+			path,
+			theFolderSpec.parID,
+			theFolderSpec.vRefNum,
+			(char *)theFolderSpec.name);
 #endif /* MACH_O_CARBON */
 	}
 }
-
 
 /*
  * Macintosh Main loop
@@ -6256,21 +6224,22 @@ int main(void)
 	/* Check for existence of Carbon */
 	err = Gestalt(gestaltCarbonVersion, &response);
 
-	if (err != noErr) quit("This program requires Carbon API");
+	if (err != noErr)
+		quit("This program requires Carbon API");
 
 	/* See if we are running on Aqua */
 	err = Gestalt(gestaltMenuMgrAttr, &response);
 
 	/* Cache the result */
 	if ((err == noErr) &&
-	                (response & gestaltMenuMgrAquaLayoutMask)) is_aqua = TRUE;
+		(response & gestaltMenuMgrAquaLayoutMask))
+		is_aqua = TRUE;
 
 	/*
 	 * Remember Mac OS version, in case we have to cope with version-specific
 	 * problems
 	 */
 	(void)Gestalt(gestaltSystemVersion, &mac_os_version);
-
 
 	/* Set up the Macintosh */
 	InitCursor();
@@ -6279,41 +6248,40 @@ int main(void)
 	FlushEvents(everyEvent, 0);
 
 	/* Flush events some more (?) */
-	if (EventAvail(everyEvent, &tempEvent)) FlushEvents(everyEvent, 0);
-
+	if (EventAvail(everyEvent, &tempEvent))
+		FlushEvents(everyEvent, 0);
 
 	/* Install the start event hook (ignore error codes) */
 	AEInstallEventHandler(
-	        kCoreEventClass,
-	        kAEOpenApplication,
-	        NewAEEventHandlerUPP(AEH_Start),
-	        0L,
-	        FALSE);
+		kCoreEventClass,
+		kAEOpenApplication,
+		NewAEEventHandlerUPP(AEH_Start),
+		0L,
+		FALSE);
 
 	/* Install the quit event hook (ignore error codes) */
 	AEInstallEventHandler(
-	        kCoreEventClass,
-	        kAEQuitApplication,
-	        NewAEEventHandlerUPP(AEH_Quit),
-	        0L,
-	        FALSE);
+		kCoreEventClass,
+		kAEQuitApplication,
+		NewAEEventHandlerUPP(AEH_Quit),
+		0L,
+		FALSE);
 
 	/* Install the print event hook (ignore error codes) */
 	AEInstallEventHandler(
-	        kCoreEventClass,
-	        kAEPrintDocuments,
-	        NewAEEventHandlerUPP(AEH_Print),
-	        0L,
-	        FALSE);
+		kCoreEventClass,
+		kAEPrintDocuments,
+		NewAEEventHandlerUPP(AEH_Print),
+		0L,
+		FALSE);
 
 	/* Install the open event hook (ignore error codes) */
 	AEInstallEventHandler(
-	        kCoreEventClass,
-	        kAEOpenDocuments,
-	        NewAEEventHandlerUPP(AEH_Open),
-	        0L,
-	        FALSE);
-
+		kCoreEventClass,
+		kAEOpenDocuments,
+		NewAEEventHandlerUPP(AEH_Open),
+		0L,
+		FALSE);
 
 #ifndef MACH_O_CARBON
 
@@ -6328,7 +6296,6 @@ int main(void)
 	/* Default to saving a "text" file */
 	_ftype = 'TEXT';
 
-
 	/* Hook in some "z-virt.c" hooks */
 	rnfree_aux = hook_rnfree;
 	ralloc_aux = hook_ralloc;
@@ -6338,7 +6305,6 @@ int main(void)
 	plog_aux = hook_plog;
 	quit_aux = hook_quit;
 	core_aux = hook_core;
-
 
 	/* Initialize colors */
 	for (i = 0; i < 256; i++)
@@ -6356,7 +6322,6 @@ int main(void)
 		color_info[i].blue = (bv | (bv << 8));
 	}
 
-
 	/* Show the "watch" cursor */
 	SetCursor(*(GetCursor(watchCursor)));
 
@@ -6367,7 +6332,8 @@ int main(void)
 	init_windows();
 
 	/* Hack -- process all events */
-	while (CheckEvents(FALSE)) /* loop */;
+	while (CheckEvents(FALSE)) /* loop */
+		;
 
 	/* Reset the cursor */
 	{
@@ -6400,14 +6366,12 @@ int main(void)
 	/* Initialize */
 	init_angband();
 
-
 	/* Hack -- process all events */
-	while (CheckEvents(FALSE)) /* loop */;
-
+	while (CheckEvents(FALSE)) /* loop */
+		;
 
 	/* We are now initialized */
 	initialized = TRUE;
-
 
 	/* Handle "open_when_ready" */
 	handle_open_when_ready();
@@ -6421,7 +6385,8 @@ int main(void)
 	Term_fresh();
 
 	/* Hack -- Process Events Forever */
-	while (TRUE) CheckEvents(TRUE);
+	while (TRUE)
+		CheckEvents(TRUE);
 
 #else
 
@@ -6446,4 +6411,3 @@ int main(void)
 }
 
 #endif /* MACINTOSH || MACH_O_CARBON */
-
